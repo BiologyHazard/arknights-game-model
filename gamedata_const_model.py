@@ -1,0 +1,6 @@
+精英化消耗龙门币: list[list[int]]
+干员升级消耗EXP: list[list[int]]
+干员升级消耗龙门币: list[list[int]]
+干员等级上限: list[list[int]]
+累计消耗EXP: list[list[int]]
+累计消耗龙门币: list[list[int]]
