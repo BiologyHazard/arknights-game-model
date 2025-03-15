@@ -1,0 +1,128 @@
+from ..item_info_model import ItemInfoDict
+from .model import GameDataModel
+
+
+class TermDescription(GameDataModel):
+    term_id: str
+    term_name: str
+    description: str
+
+
+class GamedataConst(GameDataModel):
+    max_player_level: int
+    player_exp_map: list[int]
+    player_ap_map: list[int]
+    max_level: list[list[int]]
+    character_exp_map: list[list[int]]
+    character_upgrade_cost_map: list[list[int]]
+    evolve_gold_cost: list[list[int]]
+    complete_gain_bonus: float
+    player_ap_regen_speed: int
+    max_practice_ticket: int
+    advanced_gacha_crystal_cost: int
+    complete_crystal_bonus: int
+    init_player_gold: int
+    init_player_diamond_shard: int
+    init_campaign_total_fee: int
+    init_recruit_tag_list: list[int]
+    init_char_id_list: list[str]
+    attack_max: float
+    def_max: float
+    hp_max: float
+    re_max: float
+    diamond_to_shd_rate: int
+    request_same_friend_cd: int
+    base_max_friend_num: int
+    hard_diamond_drop: int
+    inst_fin_dmd_shd_cost: int
+    easy_crystal_bonus: int
+    diamond_material_to_shard_exchange_ratio: int
+    diamond_handbook_stage_gain: int
+    ap_buy_cost: int
+    ap_buy_threshold: int
+    credit_limit: int
+    monthly_sub_remain_time_limit_days: int
+    friend_assist_rarity_limit: list[int]
+    mainline_compatible_desc: str
+    mainline_tough_desc: str
+    mainline_easy_desc: str
+    mainline_normal_desc: str
+    reject_sp_char_mission: int
+    added_reward_display_zone: str
+    one_diamond_ap: int
+    char_rotation_preset_max_cnt: int
+    char_rotation_skin_list_max_cnt: int
+    default_cr_preset_char_id: str
+    default_cr_preset_char_skin_id: str
+    default_cr_preset_bg_id: str
+    default_cr_preset_theme_id: str
+    default_cr_preset_name: str
+    char_rotation_preset_track_ts: int
+    uniequip_archive_sys_track_ts: int
+    manufact_prompt_time: int
+    rich_text_styles: dict[str, str]
+    char_assist_refresh_time: list[dict[str, int]]
+    normal_recruit_locked_string: list[str]
+    common_potential_lvl_up_count: int
+    weekly_override_desc: str
+    voucher_div: int
+    recruit_pool_version: int
+    v006_recruit_time_step1_refresh: int
+    v006_recruit_time_step2_check: int
+    v006_recruit_time_step2_flush: int
+    buy_ap_time_no_limit_flag: bool
+    is_lmgts_enabled: bool
+    legacy_time: int
+    legacy_item_list: list[ItemInfoDict]
+    use_assist_social_pt: int
+    use_assist_social_pt_max_count: int
+    assist_be_used_social_pt: dict[str, int]
+    push_forces: list[float]
+    push_force_zero_index: int
+    normal_gacha_unlock_price: list[int]
+    pull_forces: list[float]
+    pull_force_zero_index: int
+    multi_in_come_by_rank: list[str]
+    lmtgs_to_epgs_ratio: int
+    new_bee_gift_epgs: int
+    lmtgs_desc_const_one: str
+    lmtgs_desc_const_two: str
+    def_cd_prim_color: str
+    def_cd_sec_color: str
+    mail_banner_type: list[str]
+    monthly_sub_warning_time: int
+    unlimit_skin_out_of_time: int
+    replicate_shop_start_time: int
+    tso: int
+    is_dyn_illust_enabled: bool
+    is_dyn_illust_start_enabled: bool
+    is_classic_qc_shop_enabled: bool
+    is_roguelike_topic_func_enabled: bool
+    is_sandbox_perm_func_enabled: bool
+    is_roguelike_avg_achieve_func_enabled: bool
+    is_classic_potential_item_func_enabled: bool
+    is_classic_gacha_pool_func_enabled: bool
+    is_special_gacha_pool_func_enabled: bool
+    is_voucher_classic_item_distinguishable: bool
+    voucher_skin_redeem: int
+    voucher_skin_desc: str
+    charm_equip_count: int
+    term_description_dict: dict[str, TermDescription]
+    story_review_unlock_item_lack_tip: str
+    data_version: str
+    res_pref_version: str
+    announce_web_bus_type: str
+    video_player_web_bus_type: str
+    gacha_log_bus_type: str
+    default_min_continuous_battle_times: int
+    default_max_continuous_battle_times: int
+    continuous_action_open: bool
+    sub_profession_damage_type_pairs: dict[str, int]
+    classic_protect_char: list[str]
+    birthday_setting_desc: str
+    birthday_setting_confirm_desc: str
+    birthday_setting_leap_confirm_desc: str
+    leap_birthday_reward_month: int
+    leap_birthday_reward_day: int
+    birthday_setting_show_stage_id: str
+    is_birthday_func_enabled: bool

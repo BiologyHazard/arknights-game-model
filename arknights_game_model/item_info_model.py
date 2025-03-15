@@ -3,12 +3,11 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import TYPE_CHECKING, Iterable, NamedTuple, Self, SupportsIndex, TypedDict, overload
 
-if TYPE_CHECKING:
-    from item_model import 道具类
-
-
 type ItemInfoLike = ItemInfo | tuple[str, int | float] | str | ItemInfoDict
 type ItemInfoListLike = ItemInfoList | Iterable[ItemInfoLike] | str
+
+if TYPE_CHECKING:
+    from .item_model import Item
 
 
 class ItemInfoDict(TypedDict):
@@ -29,16 +28,28 @@ REPLACE_DICT = {
 }
 
 
+def escape_str(s: str) -> str:
+    for k, v in REPLACE_DICT.items():
+        s = s.replace(k, v)
+    return s
+
+
+def unescape_str(s: str) -> str:
+    for k, v in REPLACE_DICT.items():
+        s = s.replace(v, k)
+    return s
+
+
 class ItemInfo(NamedTuple):
     item_id: str
-    count: int | float = 1
+    count: int | float = 1  # type: ignore
 
     @classmethod
     def new(cls, arg: ItemInfoLike) -> Self:
         if isinstance(arg, cls):
             return arg
         elif isinstance(arg, str):
-            raise NotImplementedError
+            return cls.from_str(arg)
         elif isinstance(arg, dict):
             return cls.from_item_info_dict(arg)
         else:
@@ -49,28 +60,56 @@ class ItemInfo(NamedTuple):
         return cls(item_id=item_info_dict["id"],
                    count=item_info_dict["count"])
 
+    @classmethod
+    def from_name_and_count(cls, name: str, count: int | float = 1) -> Self:
+        from .game_data import game_data
+        item_id = game_data.items.by_name(name).item_id
+        return cls(item_id, count)
+
+    @classmethod
+    def from_str(cls, s: str) -> Self:
+        if "×" not in s:
+            return cls(s)
+        display_name, count = s.split("×")
+        name = unescape_str(display_name)
+        try:
+            count = int(count)
+        except ValueError:
+            count = float(count)
+        return cls.from_name_and_count(name, count)
+
     @property
-    def item(self) -> 道具类:
-        from load_data import 道具字典
-        return 道具字典[self.item_id]
+    def item(self) -> Item:
+        from .game_data import game_data
+        return game_data.items.by_id(self.item_id)
 
     def __str__(self) -> str:
-        from load_data import 道具字典
-        display_name = 道具字典[self.item_id].名称
-        for k, v in REPLACE_DICT.items():
-            display_name = display_name.replace(k, v)
+        display_name = escape_str(self.item.name)
         return f"{display_name}×{self.count}"
 
 
 class ItemInfoList(list[ItemInfo]):
+    # def __init__(self, items: Iterable[ItemInfoLike] = ()) -> None:
+    #     super().__init__(ItemInfo.new(item) for item in items)
+
     @classmethod
     def new(cls, arg: ItemInfoListLike) -> Self:
         if isinstance(arg, cls):
             return arg
         elif isinstance(arg, str):
-            raise NotImplementedError
+            return cls.from_str(arg)
         else:
             return cls(ItemInfo.new(item) for item in arg)
+
+    @classmethod
+    def from_name_and_count(cls, items: Iterable[tuple[str, int | float]]) -> Self:
+        return cls(ItemInfo.from_name_and_count(name, count) for name, count in items)
+
+    @classmethod
+    def from_str(cls, s: str) -> Self:
+        if s == f"{cls.__name__}()":
+            return cls()
+        return cls(ItemInfo.from_str(item_str) for item_str in s.split())
 
     def extend(self, items: Iterable[ItemInfoLike]) -> None:
         super().extend(ItemInfo.new(item) for item in items)
@@ -89,6 +128,19 @@ class ItemInfoList(list[ItemInfo]):
         counter = self.counter()
         self.clear()
         self.extend(ItemInfo(item_id, count) for item_id, count in counter.items())
+
+    @overload
+    def __getitem__(self, __i: SupportsIndex) -> ItemInfo:
+        ...
+
+    @overload
+    def __getitem__(self, __s: slice) -> Self:
+        ...
+
+    def __getitem__(self, index: SupportsIndex | slice) -> ItemInfo | Self:
+        if isinstance(index, slice):
+            return self.__class__(super().__getitem__(index))
+        return super().__getitem__(index)
 
     def __str__(self) -> str:
         if not self:
