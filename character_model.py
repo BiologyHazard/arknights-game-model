@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Sequence
 
-from models import ItemInfoList, ItemInfoDict
+from models import ItemInfoList, ItemInfoDict, ItemInfo
 from utils import 计算干员升级消耗
+import gamedata_const_model as gcm
+
 if TYPE_CHECKING:
     from item_model import 信物类
 
@@ -53,7 +55,7 @@ ID_to_职业 = {
 @dataclass
 class 精英化阶段类:
     等级上限: int
-    _升级消耗: ItemInfoDict
+    _升级消耗: list[ItemInfoDict]
 
     @property
     def 升级消耗(self) -> ItemInfoList:
@@ -77,7 +79,7 @@ class 干员类:
     描述: str
     稀有度: int
     最大潜能等级: int
-    _信物: str | None
+    _信物ID: str | None
     位置: str
     标签列表: list[str]
     是异格干员: bool
@@ -90,13 +92,69 @@ class 干员类:
     @property
     def 信物(self) -> 信物类 | None:
         from load_data import 道具字典
-        if self._信物 is None:
+        if self._信物ID is None:
             return None
-        return 道具字典[self._信物]
+        return 道具字典[self._信物ID]
 
     @property
     def 通用技能升级消耗(self) -> list[ItemInfoList]:
         return [ItemInfoList.new(x) for x in self._通用技能升级消耗]
 
+    def 计算精英化消耗(self, 目标精英化阶段: int) -> ItemInfoList:
+        if not 1 <= 目标精英化阶段 <= gcm.干员精英化阶段上限[self.稀有度]:
+            raise ValueError("精英化阶段不合法")
+
+        龙门币 = gcm.精英化消耗龙门币[self.稀有度][目标精英化阶段-1]
+        item_info_list = ItemInfoList.new([("4001", 龙门币)])
+        item_info_list.extend(self.精英化阶段列表[目标精英化阶段].升级消耗)
+
+        return item_info_list
+
     def 计算等级升级消耗(self, 初始精英化阶段: int, 初始等级: int, 目标精英化阶段: int, 目标等级: int) -> ItemInfoList:
-        return 计算干员升级消耗(self.稀有度, 初始精英化阶段, 初始等级, 目标精英化阶段, 目标等级)
+        """计算从初始等级升级到目标等级的消耗，含升级所需的EXP和龙门币，以及精英化所需的龙门币、精英材料"""
+        EXP, 龙门币 = 计算干员升级消耗(self.稀有度, 初始精英化阶段, 初始等级, 目标精英化阶段, 目标等级)
+        item_info_list = ItemInfoList.new([("exp", EXP), ("4001", 龙门币)])
+        for 当前精英化阶段 in range(初始精英化阶段, 目标精英化阶段 + 1):
+            item_info_list.extend(self.计算精英化消耗(当前精英化阶段))
+        return item_info_list
+
+    def 计算通用技能升级消耗(self, 初始技能等级: int, 目标技能等级: int) -> ItemInfoList:
+        """计算从初始技能等级升级到目标技能等级的消耗，含技能升级所需的技能专精材料"""
+        if not 1 <= 初始技能等级 <= 7:
+            raise ValueError("初始技能等级不合法")
+        if not 1 <= 目标技能等级 <= 7:
+            raise ValueError("目标技能等级不合法")
+        if 初始技能等级 >= 目标技能等级:
+            return ItemInfoList()
+
+        item_info_list = ItemInfoList()
+        for 当前等级 in range(初始技能等级, 目标技能等级):
+            item_info_list.extend(self.通用技能升级消耗[当前等级-1])
+
+        return item_info_list
+
+    def 计算技能专精消耗(self, 技能序号: int, 初始技能专精等级: int, 目标技能专精等级: int) -> ItemInfoList:
+        if not 1 <= 初始技能专精等级 <= 3:
+            raise ValueError("初始技能专精等级不合法")
+        if not 1 <= 目标技能专精等级 <= 3:
+            raise ValueError("目标技能专精等级不合法")
+        if 初始技能专精等级 >= 目标技能专精等级:
+            return ItemInfoList()
+
+        item_info_list = ItemInfoList()
+        for 当前等级 in range(初始技能专精等级, 目标技能专精等级):
+            item_info_list.extend(self.技能列表[技能序号].专精消耗[当前等级-1])
+
+        return item_info_list
+
+    def 计算养成消耗(
+        self,
+        初始精英化阶段: int, 初始等级: int, 初始技能等级: int, 初始技能专精等级: Sequence[int],
+        目标精英化阶段: int, 目标等级: int, 目标技能等级: int, 目标技能专精等级: Sequence[int],
+    ) -> ItemInfoList:
+        item_info_list = ItemInfoList()
+        item_info_list.extend(self.计算等级升级消耗(初始精英化阶段, 初始等级, 目标精英化阶段, 目标等级))
+        item_info_list.extend(self.计算通用技能升级消耗(初始技能等级, 目标技能等级))
+        for 技能序号, (初始, 目标) in enumerate(zip(初始技能专精等级, 目标技能专精等级)):
+            item_info_list.extend(self.计算技能专精消耗(技能序号, 初始, 目标))
+        return item_info_list

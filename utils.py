@@ -26,6 +26,7 @@ def 检查干员等级合法性(稀有度: int, 精英化阶段: int, 等级: in
 
 
 def 计算干员升级消耗(稀有度: int, 初始精英化阶段: int, 初始等级: int, 目标精英化阶段: int, 目标等级: int) -> tuple[int, int]:
+    """仅包含升级所需的EXP和龙门币，不包含精英化所需的龙门币"""
     import gamedata_const_model as gcm
 
     if not 检查干员等级合法性(稀有度, 初始精英化阶段, 初始等级):

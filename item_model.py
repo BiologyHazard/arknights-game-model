@@ -10,15 +10,18 @@ from character_model import 干员类
 class 道具类:
     类型ID: ClassVar[str]
     ID: str
-    类型: 道具类
+    # 类型: str
+    名称: str
+
+    def __hash__(self):
+        return hash(self.ID)
 
 
 @dataclass
 class 物品类(道具类):
-    名称: str
     描述: str
     稀有度: int
-    类型: str
+    # 类型: str
 
 
 @dataclass

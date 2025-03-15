@@ -72,6 +72,9 @@ class ItemInfoList(list[ItemInfo]):
         else:
             return cls(ItemInfo.new(item) for item in arg)
 
+    def extend(self, items: Iterable[ItemInfoLike]) -> None:
+        super().extend(ItemInfo.new(item) for item in items)
+
     def counter(self) -> defaultdict[str, int | float]:
         counter: defaultdict[str, int | float] = defaultdict(int)
         for item_id, count in self:
