@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Self
+from typing import Callable, Self
 
 from arknights_game_model.character_model import UniEquipDict
 
 from ._raw_game_data.game_data import ArknightsGameData, load_data
 from ._raw_game_data.item_table import Item as ItemInGame
+from .building_model import WorkshopFormula
 from .character_model import Character, UniEquip
 from .item_model import Item
 from .utils import 计算累计消耗
@@ -41,28 +42,40 @@ class ItemDict(dict[str, Item]):
 
 
 class GameData:
-    _raw_data: ArknightsGameData
+    raw_data: ArknightsGameData
     characters: CharacterDict
     items: ItemDict
     uniequips: dict[str, UniEquip]
+    workshop_formulas: dict[str, WorkshopFormula]
 
     def load_data(self, path: Path = Path("ArknightsGameResource/gamedata")):
-        self._raw_data = ArknightsGameData.model_validate(load_data(path))
+        self.raw_data = ArknightsGameData.model_validate(load_data(path))
         self.load_characters()
         self.load_items()
         self.load_uniequips()
+        self.load_workshop_formulas()
         self.calc_game_consts()
 
+    def _is_char_in_game(self, char_id: str) -> bool:
+        return char_id in self.raw_data.excel.building_data.chars
+
     def load_characters(self):
+        # 非升变干员
         self.characters = CharacterDict(
-            (id, Character(id=id, raw_data=character))
-            for id, character in self._raw_data.excel.character_table.items()
+            (id, Character(id=id, raw_data=character, is_patch_char=False))
+            for id, character in self.raw_data.excel.character_table.items()
+            if self._is_char_in_game(id)
+        )
+        # 升变干员
+        self.characters.update(
+            (id, Character(id=id, raw_data=character, is_patch_char=True))
+            for id, character in self.raw_data.excel.char_patch_table.patch_chars.items()
         )
 
     def load_items(self):
         self.items = ItemDict(
             (id, Item(raw_data=item))
-            for id, item in self._raw_data.excel.item_table.items.items()
+            for id, item in self.raw_data.excel.item_table.items.items()
         )
 
         exp_item_in_game = ItemInGame(
@@ -90,12 +103,18 @@ class GameData:
     def load_uniequips(self):
         self.uniequips = UniEquipDict(
             (id, UniEquip(uniequip))
-            for id, uniequip in self._raw_data.excel.uniequip_table.equip_dict.items()
+            for id, uniequip in self.raw_data.excel.uniequip_table.equip_dict.items()
+        )
+
+    def load_workshop_formulas(self):
+        self.workshop_formulas = dict(
+            (id, WorkshopFormula(formula))
+            for id, formula in self.raw_data.excel.building_data.workshop_formulas.items()
         )
 
     def calc_game_consts(self):
-        self.累计消耗EXP = 计算累计消耗(self._raw_data.excel.gamedata_const.character_exp_map)
-        self.累计消耗龙门币 = 计算累计消耗(self._raw_data.excel.gamedata_const.character_upgrade_cost_map)
+        self.累计消耗EXP = 计算累计消耗(self.raw_data.excel.gamedata_const.character_exp_map)
+        self.累计消耗龙门币 = 计算累计消耗(self.raw_data.excel.gamedata_const.character_upgrade_cost_map)
 
 
 game_data = GameData()

@@ -1,27 +1,33 @@
 import json
 from pathlib import Path
+from typing import Any
 
-from pydantic import BaseModel
-
+from .building_data import BuildingData
+from .char_patch_table import CharPatchTable
 from .character_table import CharacterTable
 from .gamedata_const import GamedataConst
 from .item_table import ItemTable
+from .model import GameDataModel
 from .uniequip_table import UniequipTable
 
 
-class Excel(BaseModel):
+class Excel(GameDataModel):
+    building_data: BuildingData
+    char_patch_table: CharPatchTable
     character_table: CharacterTable
     gamedata_const: GamedataConst
     item_table: ItemTable
     uniequip_table: UniequipTable
 
 
-class ArknightsGameData(BaseModel):
+class ArknightsGameData(GameDataModel):
     excel: Excel
 
 
 data_structure = {
     "excel": {
+        "building_data": "json",
+        "char_patch_table": "json",
         "character_table": "json",
         "gamedata_const": "json",
         "item_table": "json",
@@ -30,11 +36,11 @@ data_structure = {
 }
 
 
-def _load_recursive(path: Path, structure: dict) -> dict:
-    data = {}
+def _load_recursive(path: Path, structure: dict[str, Any]) -> dict[str, Any]:
+    data: dict[str, Any] = {}
     for key, value in structure.items():
         if isinstance(value, dict):
-            data[key] = _load_recursive(path / key, value)
+            data[key] = _load_recursive(path / key, value)  # type: ignore
         elif value == "json":
             file_path = path / f"{key}.{value}"
             with open(file_path, 'r', encoding='utf-8') as f:

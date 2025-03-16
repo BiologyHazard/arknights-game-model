@@ -111,8 +111,9 @@ class ItemInfoList(list[ItemInfo]):
             return cls()
         return cls(ItemInfo.from_str(item_str) for item_str in s.split())
 
-    def extend(self, items: Iterable[ItemInfoLike]) -> None:
-        super().extend(ItemInfo.new(item) for item in items)
+    @classmethod
+    def from_counter(cls, counter: dict[str, int | float]) -> Self:
+        return cls(ItemInfo(item_id, count) for item_id, count in counter.items())
 
     def counter(self) -> defaultdict[str, int | float]:
         counter: defaultdict[str, int | float] = defaultdict(int)
@@ -129,6 +130,40 @@ class ItemInfoList(list[ItemInfo]):
         self.clear()
         self.extend(ItemInfo(item_id, count) for item_id, count in counter.items())
 
+    def 拆分到紫材料(self) -> Self:
+        item_info_list = self.__class__()
+        for item_info in self:
+            item = item_info.item
+            if item.is_elite_material and item.rarity == 4:
+                for forumla in item.workshop_formulas_craft_self().values():
+                    costs = forumla.costs
+                    item_info_list.extend(item_info for item_info in costs if item_info.item_id != "4001")
+            else:
+                item_info_list.append(item_info)
+        return item_info_list
+
+    def 拆分到蓝材料(self) -> Self:
+        拆分到紫材料 = self.拆分到紫材料()
+        item_info_list = self.__class__()
+        for item_info in 拆分到紫材料:
+            item = item_info.item
+            if item.is_elite_material and item.rarity == 3:
+                for forumla in item.workshop_formulas_craft_self().values():
+                    costs = forumla.costs
+                    item_info_list.extend(item_info for item_info in costs if item_info.item_id != "4001")
+            else:
+                item_info_list.append(item_info)
+        return item_info_list
+
+    def sort_by_sort_id(self, reverse: bool = False) -> Self:
+        return self.__class__(sorted(self, key=lambda item_info: item_info.item.sort_id, reverse=reverse))
+
+    def sort_in_place_by_sort_id(self, reverse: bool = False) -> None:
+        self.sort(key=lambda item_info: item_info.item.sort_id, reverse=reverse)
+
+    def extend(self, items: Iterable[ItemInfoLike]) -> None:
+        super().extend(ItemInfo.new(item) for item in items)
+
     @overload
     def __getitem__(self, __i: SupportsIndex) -> ItemInfo:
         ...
@@ -141,6 +176,12 @@ class ItemInfoList(list[ItemInfo]):
         if isinstance(index, slice):
             return self.__class__(super().__getitem__(index))
         return super().__getitem__(index)
+
+    # def __add__(self, other: ItemInfoListLike) -> Self:
+    #     return self.__class__(super().__add__(ItemInfoList.new(other)))
+
+    # def __radd__(self, other: ItemInfoListLike) -> Self:
+    #     return self.__class__(ItemInfoList.new(other).__add__(self))
 
     def __str__(self) -> str:
         if not self:

@@ -1,10 +1,7 @@
-from typing import Any, Optional
-
-from pydantic import Field
 from pydantic_extra_types.color import Color
 
-from .model import GameDataModel
 from ..item_info_model import ItemInfoDict
+from .model import GameDataModel
 
 
 class Uniequip(GameDataModel):

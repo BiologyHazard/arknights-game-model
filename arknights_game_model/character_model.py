@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
 from enum import Enum
 from functools import lru_cache
-from typing import TYPE_CHECKING, NamedTuple
+from typing import NamedTuple
 
 from ._raw_game_data.character_table import Character as CharacterInGame
-from ._raw_game_data.item_table import Item as ItemInGame
 from ._raw_game_data.uniequip_table import Uniequip as UniequipInGame
 from .item_info_model import ItemInfoList
 
@@ -89,14 +87,20 @@ class UniEquip:
 class Character:
     _id: str
     _raw_data: CharacterInGame
+    _is_patch_char: bool
 
-    def __init__(self, id: str, raw_data: CharacterInGame):
+    def __init__(self, id: str, raw_data: CharacterInGame, is_patch_char: bool):
         self._id = id
         self._raw_data = raw_data
+        self._is_patch_char = is_patch_char
 
     @property
-    def ID(self) -> str:
+    def id(self) -> str:
         return self._id
+
+    @property
+    def is_patch_char(self) -> bool:
+        return self._is_patch_char
 
     @property
     def name(self) -> str:
@@ -136,7 +140,7 @@ class Character:
     @lru_cache
     def uniquips(self) -> UniEquipDict:
         from .game_data import game_data
-        uniequip_ids = game_data._raw_data.excel.uniequip_table.char_equip.get(self._id, [])
+        uniequip_ids = game_data.raw_data.excel.uniequip_table.char_equip.get(self._id, [])
         return UniEquipDict((uniequip_id, game_data.uniequips[uniequip_id]) for uniequip_id in uniequip_ids)
 
     def get_uniequip_by_type(self, type_name: str) -> UniEquip:
@@ -155,7 +159,12 @@ class Character:
         """精英化阶段范围 `[1, 2]`"""
         if not 1 <= 目标精英化阶段 <= self.max_elite_level:
             raise ValueError("精英化阶段不合法")
-        return ItemInfoList.new(self._raw_data.phases[目标精英化阶段].evolve_cost)
+
+        from .game_data import game_data
+        龙门币 = game_data.raw_data.excel.gamedata_const.evolve_gold_cost[self._raw_data.rarity][目标精英化阶段 - 1]
+        item_info_list = ItemInfoList.from_name_and_count([("龙门币", 龙门币)])
+        item_info_list.extend(self._raw_data.phases[目标精英化阶段].evolve_cost)
+        return item_info_list
 
     def 精英化消耗(self, 初始精英化阶段: int | None = None, 目标精英化阶段: int | None = None) -> ItemInfoList:
         """精英化阶段范围 `[0, 2]`"""
@@ -250,7 +259,7 @@ class Character:
         if 初始技能专精等级 is None:
             初始技能专精等级 = 0
         if 目标技能专精等级 is None:
-            目标技能专精等级 = 3
+            目标技能专精等级 = len(self._raw_data.skills[技能序号 - 1].level_up_cost_cond)
 
         item_info_list = ItemInfoList()
         for 当前技能专精等级 in range(初始技能专精等级, 目标技能专精等级):
@@ -307,6 +316,9 @@ class Character:
         for uniequip in self.uniquips().values():
             item_info_list.extend(uniequip.升级消耗())
         return item_info_list
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__module__}.{self.__class__.__name__} {self.name!r} at {id(self):#x}>"
 
 
 class UniEquipDict(dict[str, UniEquip]):
