@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import Enum
 from functools import lru_cache
-from typing import NamedTuple
+from typing import NamedTuple, Sequence
 
 from ._raw_game_data.character_table import Character as CharacterInGame
 from ._raw_game_data.uniequip_table import Uniequip as UniequipInGame
@@ -274,38 +274,47 @@ class Character:
         uniequip = self.get_uniequip(模组ID或类型)
         return uniequip.升级消耗(初始模组等级, 目标模组等级)
 
-    # def 养成消耗(
-    #     self,
-    #     初始精英化阶段: int | None = None,
-    #     初始等级: int | None = None,
-    #     初始技能等级: int | None = None,
-    #     初始技能专精等级列表: Sequence[int | None] | None = None,
-    #     初始模组等级字典: dict[str, int | None] | None = None,
-    #     目标精英化阶段: int | None = None,
-    #     目标等级: int | None = None,
-    #     目标技能等级: int | None = None,
-    #     目标技能专精等级列表: Sequence[int | None] | None = None,
-    #     目标模组等级字典: dict[str, int | None] | None = None,
-    # ) -> ItemInfoList:
-    #     if 初始技能专精等级列表 is None:
-    #         初始技能专精等级列表 = [None] * self.skill_count
-    #     if 目标技能专精等级列表 is None:
-    #         目标技能专精等级列表 = [None] * self.skill_count
-    #     专属模组ID列表 = [uniequip_id for uniequip_id, uniequip in self.uniquips().items() if not uniequip.is_original]
-    #     if 初始模组等级字典 is None:
-    #         初始模组等级字典 = dict.fromkeys(专属模组ID列表, None)
-    #     if 目标模组等级字典 is None:
-    #         目标模组等级字典 = dict.fromkeys(专属模组ID列表, None)
-    #     item_info_list = ItemInfoList()
-    #     item_info_list.extend(self.精英化等级升级消耗(初始精英化阶段, 初始等级, 目标精英化阶段, 目标等级))
-    #     item_info_list.extend(self.通用技能升级消耗(初始技能等级, 目标技能等级))
-    #     for 技能序号, (初始技能专精等级, 目标技能专精等级) in enumerate(zip(初始技能专精等级列表, 目标技能专精等级列表), start=1):
-    #         item_info_list.extend(self.技能专精消耗(技能序号, 初始技能专精等级, 目标技能专精等级))
-    #     for uniequip_id, uniequip in self.uniquips().items():
-    #         if uniequip.is_original:
-    #             continue
-    #         if uniequip_id in 初始模组等级字典 and (初始模组等级 := 初始模组等级字典[uniequip_id]):
-    #     return item_info_list
+    def 养成消耗(
+        self,
+        初始精英化阶段: int | None = None,
+        初始等级: int | None = None,
+        初始技能等级: int | None = None,
+        初始技能专精等级列表: Sequence[int | None] | None = None,
+        初始模组等级字典: dict[str, int | None] | None = None,
+        目标精英化阶段: int | None = None,
+        目标等级: int | None = None,
+        目标技能等级: int | None = None,
+        目标技能专精等级列表: Sequence[int | None] | None = None,
+        目标模组等级字典: dict[str, int | None] | None = None,
+    ) -> ItemInfoList:
+        if 初始技能专精等级列表 is None:
+            初始技能专精等级列表 = [None] * self.skill_count
+        if 目标技能专精等级列表 is None:
+            目标技能专精等级列表 = [None] * self.skill_count
+        专属模组ID列表 = [uniequip_id for uniequip_id, uniequip in self.uniquips().items() if not uniequip.is_original]
+        if 初始模组等级字典 is None:
+            初始模组等级字典 = dict.fromkeys(专属模组ID列表, None)
+        if 目标模组等级字典 is None:
+            目标模组等级字典 = dict.fromkeys(专属模组ID列表, None)
+        item_info_list = ItemInfoList()
+        item_info_list.extend(self.精英化等级升级消耗(初始精英化阶段, 初始等级, 目标精英化阶段, 目标等级))
+        item_info_list.extend(self.通用技能升级消耗(初始技能等级, 目标技能等级))
+        for 技能序号, (初始技能专精等级, 目标技能专精等级) in enumerate(zip(初始技能专精等级列表, 目标技能专精等级列表), start=1):
+            item_info_list.extend(self.技能专精消耗(技能序号, 初始技能专精等级, 目标技能专精等级))
+        for uniequip_id, uniequip in self.uniquips().items():
+            if uniequip.is_original:
+                continue
+            在初始模组等级字典中 = uniequip_id in 初始模组等级字典 or uniequip.type_name2 in 初始模组等级字典
+            在目标模组等级字典中 = uniequip_id in 目标模组等级字典 or uniequip.type_name2 in 目标模组等级字典
+            if 在初始模组等级字典中 and 在目标模组等级字典中:
+                初始模组等级 = (初始模组等级字典[uniequip_id] if uniequip_id in 初始模组等级字典
+                          else 初始模组等级字典[uniequip.type_name2])  # type: ignore
+                目标模组等级 = (目标模组等级字典[uniequip_id] if uniequip_id in 目标模组等级字典
+                          else 目标模组等级字典[uniequip.type_name2])  # type: ignore
+                item_info_list.extend(self.模组升级消耗(uniequip_id, 初始模组等级, 目标模组等级))
+            elif 在初始模组等级字典中 or 在目标模组等级字典中:
+                raise ValueError(f"模组 {uniequip!r} 的初始等级和目标等级需同时指定")
+        return item_info_list
 
     def 拉满消耗(self) -> ItemInfoList:
         item_info_list = ItemInfoList()
