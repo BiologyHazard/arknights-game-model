@@ -130,30 +130,27 @@ class ItemInfoList(list[ItemInfo]):
         self.clear()
         self.extend(ItemInfo(item_id, count) for item_id, count in counter.items())
 
-    def 拆分到紫材料(self) -> Self:
+    def _拆分特定稀有度精英材料(self, rarity: int) -> Self:
         item_info_list = self.__class__()
         for item_info in self:
             item = item_info.item
-            if item.is_elite_material and item.rarity == 4:
-                for forumla in item.workshop_formulas_craft_self().values():
-                    costs = forumla.costs
-                    item_info_list.extend(item_info for item_info in costs if item_info.item_id != "4001")
+            count = item_info.count
+            if item.is_elite_material and item.rarity == rarity:
+                workshop_formulas_craft_self = item.workshop_formulas_craft_self()
+                assert len(workshop_formulas_craft_self) == 1
+                formula = next(iter(workshop_formulas_craft_self.values()))
+                item_info_list.extend((item_info.item_id, item_info.count * count)
+                                      for item_info in formula.costs if item_info.item_id != "4001")
             else:
                 item_info_list.append(item_info)
         return item_info_list
 
+    def 拆分到紫材料(self) -> Self:
+        return self._拆分特定稀有度精英材料(4)
+
     def 拆分到蓝材料(self) -> Self:
         拆分到紫材料 = self.拆分到紫材料()
-        item_info_list = self.__class__()
-        for item_info in 拆分到紫材料:
-            item = item_info.item
-            if item.is_elite_material and item.rarity == 3:
-                for forumla in item.workshop_formulas_craft_self().values():
-                    costs = forumla.costs
-                    item_info_list.extend(item_info for item_info in costs if item_info.item_id != "4001")
-            else:
-                item_info_list.append(item_info)
-        return item_info_list
+        return 拆分到紫材料._拆分特定稀有度精英材料(3)
 
     def sort_by_sort_id(self, reverse: bool = False) -> Self:
         return self.__class__(sorted(self, key=lambda item_info: item_info.item.sort_id, reverse=reverse))
