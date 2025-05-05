@@ -60,6 +60,7 @@ class GamedataConst(GameDataModel):
     char_rotation_preset_track_ts: int
     uniequip_archive_sys_track_ts: int
     manufact_prompt_time: int
+    main_guide_actived_stage_id: str
     rich_text_styles: dict[str, str]
     char_assist_refresh_time: list[dict[str, int]]
     normal_recruit_locked_string: list[str]
@@ -114,9 +115,9 @@ class GamedataConst(GameDataModel):
     announce_web_bus_type: str
     video_player_web_bus_type: str
     gacha_log_bus_type: str
-    default_min_continuous_battle_times: int
-    default_max_continuous_battle_times: int
-    continuous_action_open: bool
+    default_min_multiple_battle_times: int
+    default_max_multiple_battle_times: int
+    multiple_action_open: bool
     sub_profession_damage_type_pairs: dict[str, int]
     classic_protect_char: list[str]
     birthday_setting_desc: str

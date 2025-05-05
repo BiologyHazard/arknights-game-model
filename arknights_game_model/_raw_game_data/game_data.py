@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any
 
 from .building_data import BuildingData
+from .campaign_table import CampaignTable
 from .char_patch_table import CharPatchTable
 from .character_table import CharacterTable
 from .gamedata_const import GamedataConst
@@ -13,6 +14,7 @@ from .uniequip_table import UniequipTable
 
 class Excel(GameDataModel):
     building_data: BuildingData
+    campaign_table: CampaignTable
     char_patch_table: CharPatchTable
     character_table: CharacterTable
     gamedata_const: GamedataConst
@@ -27,6 +29,7 @@ class ArknightsGameData(GameDataModel):
 data_structure = {
     "excel": {
         "building_data": "json",
+        "campaign_table": "json",
         "char_patch_table": "json",
         "character_table": "json",
         "gamedata_const": "json",

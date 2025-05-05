@@ -9,6 +9,7 @@ from ._raw_game_data.game_data import ArknightsGameData, load_data
 from ._raw_game_data.item_table import Item as ItemInGame
 from .building_model import WorkshopFormula
 from .character_model import Character, UniEquip
+from .item_info_model import ItemInfoList
 from .item_model import Item
 from .utils import 计算累计消耗
 
@@ -25,6 +26,18 @@ class CharacterDict(dict[str, Character]):
 
     def filter(self, function: Callable[[Character], bool]) -> Self:
         return self.__class__((k, v) for k, v in self.items() if function(v))
+
+    def 全干员拉满消耗(self) -> ItemInfoList:
+        item_info_list = ItemInfoList()
+        for character in self.values():
+            if character.is_patch_char:
+                cost = character.技能专精消耗(1) + character.技能专精消耗(2)
+                for uniequip in character.uniquips().values():
+                    cost += uniequip.升级消耗()
+            else:
+                cost = character.拉满消耗()
+            item_info_list.extend(cost)
+        return item_info_list
 
 
 class ItemDict(dict[str, Item]):
@@ -57,6 +70,7 @@ class GameData:
         self.calc_game_consts()
 
     def _is_char_in_game(self, char_id: str) -> bool:
+        """判断是否为实装干员，目前的方法是判断是否有基建技能"""
         return char_id in self.raw_data.excel.building_data.chars
 
     def load_characters(self):

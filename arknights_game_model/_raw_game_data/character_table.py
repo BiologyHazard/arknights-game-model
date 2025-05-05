@@ -1,9 +1,15 @@
 from typing import Any
 
-from pydantic import Field
+from pydantic import Field, ConfigDict
 
 from ..item_info_model import ItemInfoDict
 from .model import GameDataModel
+
+
+class Power(GameDataModel):
+    nation_id: str | None
+    group_id: str | None
+    team_id: str | None
 
 
 class UnlockCondition(GameDataModel):
@@ -55,6 +61,7 @@ class AttributeKeyFrameData(GameDataModel):
     levitate_immune: bool
     disarmed_combat_immune: bool
     feared_immune: bool
+    palsy_immune: bool
 
 
 class AttributeKeyFrame(GameDataModel):
@@ -115,6 +122,7 @@ class AllSkillLvlup(GameDataModel):
 class Character(GameDataModel):
     name: str
     description: str | None
+    sort_index: int
     can_use_general_potential_item: bool
     can_use_activity_potential_item: bool
     potential_item_id: str | None
@@ -123,6 +131,8 @@ class Character(GameDataModel):
     nation_id: str | None
     group_id: str | None
     team_id: str | None
+    main_power: Power
+    sub_power: list[Power]
     display_number: str | None
     appellation: str
     position: str

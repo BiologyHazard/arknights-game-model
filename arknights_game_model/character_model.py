@@ -126,9 +126,9 @@ class Character:
     def skill_count(self) -> int:
         return len(self._raw_data.skills)
 
-    # @property
-    # def max_skill_level(self) -> int:
-    #     return len(self._raw_data.all_skill_lvlup)
+    @property
+    def max_skill_level(self) -> int:
+        return len(self._raw_data.all_skill_lvlup) + 1
 
     @property
     def max_elite_level(self) -> int:
@@ -235,7 +235,7 @@ class Character:
         if 初始技能等级 is None:
             初始技能等级 = 1
         if 目标技能等级 is None:
-            目标技能等级 = 7 if self.skill_count > 1 else 1
+            目标技能等级 = self.max_skill_level
 
         item_info_list = ItemInfoList()
         for 当前技能等级 in range(初始技能等级, 目标技能等级):
