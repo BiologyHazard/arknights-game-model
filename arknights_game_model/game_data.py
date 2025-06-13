@@ -31,13 +31,17 @@ class CharacterDict(dict[str, Character]):
         item_info_list = ItemInfoList()
         for character in self.values():
             if character.is_patch_char:
-                cost = character.技能专精消耗(1) + character.技能专精消耗(2)
+                # 升变干员
+                for skill_index in range(1, character.skill_count + 1):
+                    item_info_list.extend(character.技能专精消耗(skill_index))
                 for uniequip in character.uniquips().values():
-                    cost += uniequip.升级消耗()
+                    item_info_list.extend(uniequip.升级消耗())
             else:
-                cost = character.拉满消耗()
-            item_info_list.extend(cost)
+                item_info_list.extend(character.拉满消耗())
         return item_info_list
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__module__}.{self.__class__.__name__}({super().__repr__()})"
 
 
 class ItemDict(dict[str, Item]):
@@ -52,6 +56,9 @@ class ItemDict(dict[str, Item]):
 
     def filter(self, function: Callable[[Item], bool]) -> Self:
         return self.__class__((k, v) for k, v in self.items() if function(v))
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__module__}.{self.__class__.__name__}({super().__repr__()})"
 
 
 class GameData:
@@ -92,6 +99,7 @@ class GameData:
             for id, item in self.raw_data.excel.item_table.items.items()
         )
 
+        # 添加 EXP 物品
         exp_item_in_game = ItemInGame(
             item_id="exp",
             name="EXP",

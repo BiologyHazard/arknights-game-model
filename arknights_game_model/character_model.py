@@ -83,6 +83,9 @@ class UniEquip:
             item_info_list.extend(self.升级一次消耗(当前等级 + 1))
         return item_info_list
 
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__module__}.{self.__class__.__name__} uniequip_id={self.uniequip_id!r} uniequip_name={self.uniequip_name!r} type_name1={self.type_name1!r} type_name2={self.type_name2!r}>"
+
 
 class Character:
     _id: str
@@ -255,7 +258,10 @@ class Character:
         return ItemInfoList.new(self._raw_data.skills[技能序号 - 1].level_up_cost_cond[目标技能专精等级 - 1].level_up_cost)
 
     def 技能专精消耗(self, 技能序号: int, 初始技能专精等级: int | None = None, 目标技能专精等级: int | None = None) -> ItemInfoList:
-        """专精等级范围 `[0, 3]`"""
+        """
+        技能序号范围 `[1, 3]`
+        专精等级范围 `[0, 3]`
+        """
         if 初始技能专精等级 is None:
             初始技能专精等级 = 0
         if 目标技能专精等级 is None:
@@ -317,6 +323,9 @@ class Character:
         return item_info_list
 
     def 拉满消耗(self) -> ItemInfoList:
+        """
+        未对升变干员特殊处理
+        """
         item_info_list = ItemInfoList()
         item_info_list.extend(self.精英化等级升级消耗())
         item_info_list.extend(self.通用技能升级消耗())
@@ -327,11 +336,9 @@ class Character:
         return item_info_list
 
     def __repr__(self) -> str:
-        return f"<{self.__class__.__module__}.{self.__class__.__name__} {self.name!r} at {id(self):#x}>"
+        return f"<{self.__class__.__module__}.{self.__class__.__name__} id={self.id!r} name={self.name!r}>"
 
 
 class UniEquipDict(dict[str, UniEquip]):
-    pass
-
-    # def __repr__(self) -> str:
-    #     return f"<{self.__class__.__module__}.{self.__class__.__name__} object ({self.name!r}) at {id(self):#x}>"
+    def __repr__(self) -> str:
+        return f"{self.__class__.__module__}.{self.__class__.__name__}({super().__repr__()})"
