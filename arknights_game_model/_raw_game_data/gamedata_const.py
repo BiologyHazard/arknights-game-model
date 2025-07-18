@@ -127,3 +127,4 @@ class GamedataConst(GameDataModel):
     leap_birthday_reward_day: int
     birthday_setting_show_stage_id: str
     is_birthday_func_enabled: bool
+    is_so_char_enabled: bool

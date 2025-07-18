@@ -28,6 +28,12 @@ class VoucherRelate(GameDataModel):
     voucher_item_type: str
 
 
+class ShopRelateInfo(GameDataModel):
+    shop_type: int
+    shop_group: int
+    start_ts: int
+
+
 class Item(GameDataModel):
     item_id: str
     name: str
@@ -45,6 +51,7 @@ class Item(GameDataModel):
     stage_drop_list: list[StageDrop]
     building_product_list: list[BuildingProduct]
     voucher_relate_list: list[VoucherRelate]
+    shop_relate_info_list: list[ShopRelateInfo]
 
 
 class ExpItem(GameDataModel):
@@ -101,3 +108,4 @@ class ItemTable(GameDataModel):
     full_potential_characters: dict[str, FullPotentialCharacter]
     activity_potential_characters: dict[str, ActivityPotentialCharacter]
     favor_characters: dict[str, FavorCharacter]
+    item_shop_name_dict: dict[str, str]

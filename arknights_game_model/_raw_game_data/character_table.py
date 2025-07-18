@@ -1,6 +1,6 @@
 from typing import Any
 
-from pydantic import Field, ConfigDict
+from pydantic import Field
 
 from ..item_info_model import ItemInfoDict
 from .model import GameDataModel
@@ -62,6 +62,7 @@ class AttributeKeyFrameData(GameDataModel):
     disarmed_combat_immune: bool
     feared_immune: bool
     palsy_immune: bool
+    attract_immune: bool
 
 
 class AttributeKeyFrame(GameDataModel):
@@ -123,6 +124,8 @@ class Character(GameDataModel):
     name: str
     description: str | None
     sort_index: int
+    sp_target_type: int
+    sp_target_id: str | None
     can_use_general_potential_item: bool
     can_use_activity_potential_item: bool
     potential_item_id: str | None

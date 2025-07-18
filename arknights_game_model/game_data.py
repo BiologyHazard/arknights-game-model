@@ -3,12 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable, Self
 
-from arknights_game_model.character_model import UniEquipDict
-
 from ._raw_game_data.game_data import ArknightsGameData, load_data
 from ._raw_game_data.item_table import Item as ItemInGame
 from .building_model import WorkshopFormula
-from .character_model import Character, UniEquip
+from .character_model import Character, UniEquip, UniEquipDict
 from .item_info_model import ItemInfoList
 from .item_model import Item
 from .utils import 计算累计消耗
@@ -117,6 +115,7 @@ class GameData:
             stage_drop_list=[],
             building_product_list=[],
             voucher_relate_list=[],
+            shop_relate_info_list=[],
         )
 
         EXP_item = Item(exp_item_in_game)

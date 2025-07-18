@@ -26,6 +26,7 @@ class Item:
 
     @property
     def is_elite_material(self) -> bool:
+        """是否是精英材料，使用 `sort_id` 判断，不一定准确"""
         return 100000 <= self.sort_id < 200000
 
     def workshop_formulas_craft_self(self) -> dict[str, WorkshopFormula]:
