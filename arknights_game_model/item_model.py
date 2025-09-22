@@ -4,9 +4,12 @@ from .building_model import WorkshopFormula
 
 class Item:
     _raw_data: ItemInGame
+    _yituliu_item_value: float
 
-    def __init__(self, raw_data: ItemInGame):
+    def __init__(self, raw_data: ItemInGame, yituliu_item_value: float | None = None) -> None:
         self._raw_data = raw_data
+        if yituliu_item_value is not None:
+            self._yituliu_item_value = yituliu_item_value
 
     @property
     def item_id(self) -> str:
@@ -28,6 +31,11 @@ class Item:
     def is_elite_material(self) -> bool:
         """是否是精英材料，使用 `sort_id` 判断，不一定准确"""
         return 100000 <= self.sort_id < 200000
+
+    @property
+    def yituliu_item_value(self) -> float:
+        """一图流物品价值，数据来自明日方舟一图流，若不存在则抛出 `AttributeError`"""
+        return self._yituliu_item_value
 
     def workshop_formulas_craft_self(self) -> dict[str, WorkshopFormula]:
         """合成自身的配方"""

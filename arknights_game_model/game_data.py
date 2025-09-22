@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, Self
+from typing import Self
 
 from ._raw_game_data.game_data import ArknightsGameData, load_data
 from ._raw_game_data.item_table import Item as ItemInGame
@@ -9,6 +10,7 @@ from .building_model import WorkshopFormula
 from .character_model import Character, UniEquip, UniEquipDict
 from .item_info_model import ItemInfoList
 from .item_model import Item
+from .log import logger
 from .utils import 计算累计消耗
 
 
@@ -20,7 +22,7 @@ class CharacterDict(dict[str, Character]):
         for character in self.values():
             if character.name == character_name:
                 return character
-        raise ValueError(f"Character {character_name!r} not found")
+        raise KeyError(f"Character {character_name!r} not found")
 
     def filter(self, function: Callable[[Character], bool]) -> Self:
         return self.__class__((k, v) for k, v in self.items() if function(v))
@@ -66,10 +68,10 @@ class GameData:
     uniequips: dict[str, UniEquip]
     workshop_formulas: dict[str, WorkshopFormula]
 
-    def load_data(self, path: Path = Path("ArknightsGameResource/gamedata")):
-        self.raw_data = ArknightsGameData.model_validate(load_data(path))
-        self.load_characters()
-        self.load_items()
+    def load_data(self, *, gamedata_folder: Path, online_time_path: Path, yituliu_item_value_path: Path) -> None:
+        self.raw_data = ArknightsGameData.model_validate(load_data(gamedata_folder))
+        self.load_characters(online_time_path)
+        self.load_items(yituliu_item_value_path)
         self.load_uniequips()
         self.load_workshop_formulas()
         self.calc_game_consts()
@@ -78,7 +80,7 @@ class GameData:
         """判断是否为实装干员，目前的方法是判断是否有基建技能"""
         return char_id in self.raw_data.excel.building_data.chars
 
-    def load_characters(self):
+    def load_characters(self, online_time_path: Path):
         # 非升变干员
         self.characters = CharacterDict(
             (id, Character(id=id, raw_data=character, is_patch_char=False))
@@ -90,8 +92,11 @@ class GameData:
             (id, Character(id=id, raw_data=character, is_patch_char=True))
             for id, character in self.raw_data.excel.char_patch_table.patch_chars.items()
         )
+        # 干员上线时间
+        from prts_wiki.char_cn_online_time_patch import patch_to
+        patch_to(self, online_time_path)
 
-    def load_items(self):
+    def load_items(self, yituliu_item_value_path: Path):
         self.items = ItemDict(
             (id, Item(raw_data=item))
             for id, item in self.raw_data.excel.item_table.items.items()
@@ -117,15 +122,28 @@ class GameData:
             voucher_relate_list=[],
             shop_relate_info_list=[],
         )
-
         EXP_item = Item(exp_item_in_game)
         self.items[exp_item_in_game.item_id] = EXP_item
+
+        # 一图流物品价值
+        from yituliu.item_value import patch_to
+        patch_to(self, yituliu_item_value_path)
 
     def load_uniequips(self):
         self.uniequips = UniEquipDict(
             (id, UniEquip(uniequip))
             for id, uniequip in self.raw_data.excel.uniequip_table.equip_dict.items()
         )
+
+        # 设置模组上线时间
+        for equip_track in self.raw_data.excel.uniequip_table.equip_track_dict:
+            for track_item in equip_track.track_list:
+                self.uniequips[track_item.equip_id]._online_timestamp = equip_track.time_stamp
+
+        # 断言每个模组都有上线时间
+        for uniequip in self.uniequips.values():
+            if not hasattr(uniequip, "_online_timestamp"):
+                logger.warning(f"模组 {uniequip} 没有上线时间")
 
     def load_workshop_formulas(self):
         self.workshop_formulas = dict(

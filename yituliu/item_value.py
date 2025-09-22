@@ -1,27 +1,43 @@
+from __future__ import annotations
+
+import json
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from arknights_game_model.item_info_model import ItemInfoList
-from arknights_game_model.log import logger
-
-from .api_model.item_value import ItemValueApi
+if TYPE_CHECKING:
+    from arknights_game_model.game_data import GameData
 
 
-class YituliuItemValue:
-    def __init__(self, path: Path):
-        self.item_value_api = ItemValueApi.model_validate_json(path.read_text("utf-8"))
-        self.item_id_to_value = {
-            x.item_id: x.item_value_ap
-            for x in self.item_value_api.data
-        }
+def patch_to(game_data: GameData, path: Path) -> None:
+    from arknights_game_model.log import logger
+    if not path.is_file():
+        raise FileNotFoundError(f"Item value file not found: {path}")
 
-    def calculate_total_value(self, item_info_list: ItemInfoList):
-        value = 0
-        for item_info in item_info_list:
-            if item_info.item_id == "exp":
-                value += self.item_id_to_value["2003"] * item_info.count / 1000
-            else:
-                if item_info.item_id not in self.item_id_to_value:
-                    logger.warning(f"未找到 {item_info.item_id} 的价值")
-                    continue
-                value += self.item_id_to_value[item_info.item_id] * item_info.count
-        return value
+    with open(path, 'r', encoding='utf-8') as f:
+        obj = json.load(f)
+
+    if "data" in obj:
+        item_id_to_value: dict[str, float] = {x["itemId"]: x["itemValueAp"] for x in obj["data"]}
+        item_id_to_name: dict[str, str] = {x["itemId"]: x["itemName"] for x in obj["data"]}
+
+    else:
+        item_id_to_value = {x["id"]: x["apValue"] for x in obj}
+        item_id_to_name = {x["id"]: x["name"] for x in obj}
+
+    if "2003" in item_id_to_value:
+        item_id_to_value["exp"] = item_id_to_value["2003"] / 1000
+
+    # for item_id, item in game_data.items.items():
+    #     if item_id in item_id_to_value:
+    #         item._yituliu_item_value = item_id_to_value[item_id]
+
+    for item_id, item_value in item_id_to_value.items():
+        if item_id in game_data.items:
+            game_data.items[item_id]._yituliu_item_value = item_value
+
+    not_in_yituliu_names = [item.name for item_id, item in game_data.items.items() if item_id not in item_id_to_value.keys()]
+    not_in_item_table_names = [item_name for item_id, item_name in item_id_to_name.items() if item_id not in game_data.items]
+    if not_in_yituliu_names:
+        logger.warning(f"以下物品在 item_table 中，但不在一图流物品价值表中：\n{', '.join(not_in_yituliu_names)}")
+    if not_in_item_table_names:
+        logger.warning(f"以下物品在一图流物品价值表中，但不在 item_table 中：\n{', '.join(not_in_item_table_names)}")

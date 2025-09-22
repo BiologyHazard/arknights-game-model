@@ -1,12 +1,17 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from enum import Enum
 from functools import lru_cache
-from typing import NamedTuple, Sequence
+from typing import TYPE_CHECKING, NamedTuple
 
+from ._raw_game_data.building_data import Char as CharInGame
 from ._raw_game_data.character_table import Character as CharacterInGame
 from ._raw_game_data.uniequip_table import Uniequip as UniequipInGame
 from .item_info_model import ItemInfoList
+
+if TYPE_CHECKING:
+    from pandas import Timestamp
 
 
 class Profession(NamedTuple):
@@ -31,9 +36,12 @@ class Professions(Enum):
 
 class UniEquip:
     _raw_data: UniequipInGame
+    _online_timestamp: int
 
-    def __init__(self, raw_data: UniequipInGame):
+    def __init__(self, raw_data: UniequipInGame, online_timestamp: int | None = None):
         self._raw_data = raw_data
+        if online_timestamp is not None:
+            self._online_timestamp = online_timestamp
 
     @property
     def uniequip_id(self) -> str:
@@ -58,7 +66,18 @@ class UniEquip:
         assert b1 == b2
         return b1
 
+    @property
+    def character_id(self) -> str:
+        """获取模组对应的干员 ID"""
+        return self._raw_data.char_id
+
+    @property
+    def online_timestamp(self) -> int:
+        """获取模组上线时间戳"""
+        return self._online_timestamp
+
     def character(self) -> Character:
+        """获取模组对应的干员"""
         from .game_data import game_data
         return game_data.characters.by_id(self._raw_data.char_id)
 
@@ -91,11 +110,14 @@ class Character:
     _id: str
     _raw_data: CharacterInGame
     _is_patch_char: bool
+    _cn_online_time: Timestamp
 
-    def __init__(self, id: str, raw_data: CharacterInGame, is_patch_char: bool):
+    def __init__(self, id: str, raw_data: CharacterInGame, is_patch_char: bool, cn_online_time: Timestamp | None = None):
         self._id = id
         self._raw_data = raw_data
         self._is_patch_char = is_patch_char
+        if cn_online_time is not None:
+            self._cn_online_time = cn_online_time
 
     @property
     def id(self) -> str:
@@ -137,20 +159,32 @@ class Character:
     def max_elite_level(self) -> int:
         return len(self._raw_data.phases) - 1
 
+    @property
+    def cn_online_time(self) -> Timestamp:
+        """干员上线时间，数据来自 PRTS Wiki，若不存在则抛出 `AttributeError`"""
+        return self._cn_online_time
+
     def max_level(self, elite_level: int) -> int:
         return self._raw_data.phases[elite_level].max_level
 
     @lru_cache
+    def uniequip_ids(self) -> list[str]:
+        from .game_data import game_data
+        return game_data.raw_data.excel.uniequip_table.char_equip.get(self._id, [])
+
     def uniquips(self) -> UniEquipDict:
         from .game_data import game_data
-        uniequip_ids = game_data.raw_data.excel.uniequip_table.char_equip.get(self._id, [])
-        return UniEquipDict((uniequip_id, game_data.uniequips[uniequip_id]) for uniequip_id in uniequip_ids)
+        return UniEquipDict((uniequip_id, game_data.uniequips[uniequip_id]) for uniequip_id in self.uniequip_ids())
 
     def get_uniequip_by_type(self, type_name: str) -> UniEquip:
+        if type_name == "α":
+            type_name = "A"
+        if type_name == "Δ":
+            type_name = "D"
         for uniequip in self.uniquips().values():
             if type_name.upper() in (uniequip.type_name1, uniequip.type_name2):
                 return uniequip
-        raise ValueError(f"未找到类型为 {type_name!r} 的模组")
+        raise ValueError(f"干员 {self.name} 未找到类型为 {type_name!r} 的模组")
 
     def get_uniequip(self, id_or_type: str) -> UniEquip:
         if id_or_type in self.uniquips():
@@ -285,12 +319,12 @@ class Character:
         初始精英化阶段: int | None = None,
         初始等级: int | None = None,
         初始技能等级: int | None = None,
-        初始技能专精等级列表: Sequence[int | None] | None = None,
+        初始技能专精等级列表: Iterable[int | None] | None = None,
         初始模组等级字典: dict[str, int | None] | None = None,
         目标精英化阶段: int | None = None,
         目标等级: int | None = None,
         目标技能等级: int | None = None,
-        目标技能专精等级列表: Sequence[int | None] | None = None,
+        目标技能专精等级列表: Iterable[int | None] | None = None,
         目标模组等级字典: dict[str, int | None] | None = None,
     ) -> ItemInfoList:
         if 初始技能专精等级列表 is None:

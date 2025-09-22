@@ -1,13 +1,21 @@
-from arknights_game_model.character_model import Professions as P
-from arknights_game_model.character_model import 职业ID_to_职业 as p
-from arknights_game_model.game_data import game_data
+from arknights_game_model.building_model import WorkshopFormula
+from arknights_game_model.character_model import Professions, UniEquip, 职业ID_to_职业
+from arknights_game_model.game_data import CharacterDict, GameData, ItemDict, game_data
+from arknights_game_model.item_info_model import ItemInfo, ItemInfoDict, ItemInfoList
 
 game_data.load_data()
 
-c = game_data.characters
-i = game_data.items
-u = game_data.uniequips
-wf = game_data.workshop_formulas
+gd: GameData = game_data
+P = Professions
+p: dict[str, Professions] = 职业ID_to_职业
+ii = ItemInfo
+iil = ItemInfoList
+iid = ItemInfoDict
+
+c: CharacterDict = game_data.characters
+i: ItemDict = game_data.items
+u: dict[str, UniEquip] = game_data.uniequips
+wf: dict[str, WorkshopFormula] = game_data.workshop_formulas
 
 for character in c.values():
     globals()[character.name] = character
@@ -15,3 +23,6 @@ for item in i.values():
     globals()[item.name] = item
 for uniequip in u.values():
     globals()[uniequip.uniequip_name] = uniequip
+
+
+del character, item, uniequip  # type: ignore

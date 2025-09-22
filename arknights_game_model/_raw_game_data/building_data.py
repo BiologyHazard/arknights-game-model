@@ -1,9 +1,45 @@
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import ConfigDict
 
-from .model import GameDataModel
 from ..item_info_model import ItemInfoDict
+from .model import GameDataModel
+
+
+class Cond(GameDataModel):
+    phase: int
+    level: int
+
+
+class BuffDataItem(GameDataModel):
+    buff_id: str
+    cond: Cond
+
+
+class BuffCharItem(GameDataModel):
+    buff_data: list[BuffDataItem]
+
+
+class Char(GameDataModel):
+    char_id: str
+    max_manpower: Literal[8640000]
+    buff_char: list[BuffCharItem]
+
+
+class Buff(GameDataModel):
+    buff_id: str
+    buff_name: str
+    buff_icon: str
+    skill_icon: str
+    sort_id: int
+    buff_color: str
+    text_color: str
+    buff_category: str
+    room_type: str
+    description: str
+    efficiency: int
+    target_group_sort_id: int
+    targets: list[str]
 
 
 class ExtraOutcome(GameDataModel):
@@ -43,5 +79,6 @@ class WorkshopFormula(GameDataModel):
 class BuildingData(GameDataModel):
     model_config = ConfigDict(extra="allow")
 
-    chars: dict[str, Any]
+    chars: dict[str, Char]
+    buffs: dict[str, Buff]
     workshop_formulas: dict[str, WorkshopFormula]

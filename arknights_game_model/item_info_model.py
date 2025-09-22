@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import sys
 from collections import defaultdict
-from typing import TYPE_CHECKING, Iterable, NamedTuple, Self, SupportsIndex, TypedDict, overload
+from collections.abc import Iterable, Mapping, Callable
+from typing import TYPE_CHECKING, NamedTuple, Self, SupportsIndex, TypedDict, overload
 
 type ItemInfoLike = ItemInfo | tuple[str, int | float] | str | ItemInfoDict
 type ItemInfoListLike = ItemInfoList | Iterable[ItemInfoLike] | str
 
 if TYPE_CHECKING:
+    import pandas as pd
+
     from .item_model import Item
 
 
@@ -83,8 +87,18 @@ class ItemInfo(NamedTuple):
         from .game_data import game_data
         return game_data.items.by_id(self.item_id)
 
+    def yituliu_value(self, *, strict: bool) -> float:
+        if strict and not hasattr(self.item, "yituliu_item_value"):
+            raise ValueError(f"物品 {self.item_id} 没有一图流价值")
+        else:
+            return getattr(self.item, "yituliu_item_value", 0)
+
     def __str__(self) -> str:
-        display_name = escape_str(self.item.name)
+        try:
+            name = self.item.name
+        except KeyError:
+            name = self.item_id
+        display_name = escape_str(name)
         return f"{display_name}×{self.count}"
 
 
@@ -112,7 +126,7 @@ class ItemInfoList(list[ItemInfo]):
         return cls(ItemInfo.from_str(item_str) for item_str in s.split())
 
     @classmethod
-    def from_counter(cls, counter: dict[str, int | float]) -> Self:
+    def from_counter(cls, counter: Mapping[str, int | float]) -> Self:
         return cls(ItemInfo(item_id, count) for item_id, count in counter.items())
 
     def counter(self) -> defaultdict[str, int | float]:
@@ -139,7 +153,7 @@ class ItemInfoList(list[ItemInfo]):
                 workshop_formulas_craft_self = item.workshop_formulas_craft_self()
                 assert len(workshop_formulas_craft_self) == 1
                 formula = next(iter(workshop_formulas_craft_self.values()))
-                item_info_list.extend((item_info.item_id, item_info.count * count)
+                item_info_list.extend(ItemInfo(item_info.item_id, item_info.count * count)
                                       for item_info in formula.costs if item_info.item_id != "4001")
             else:
                 item_info_list.append(item_info)
@@ -158,32 +172,135 @@ class ItemInfoList(list[ItemInfo]):
     def sort_in_place_by_sort_id(self, reverse: bool = False) -> None:
         self.sort(key=lambda item_info: item_info.item.sort_id, reverse=reverse)
 
-    def extend(self, items: Iterable[ItemInfoLike]) -> None:
-        super().extend(ItemInfo.new(item) for item in items)
+    def yituliu_value(self, *, strict: bool) -> float:
+        return sum(item_info.yituliu_value(strict=strict) * item_info.count for item_info in self)
 
-    @overload
-    def __getitem__(self, __i: SupportsIndex) -> ItemInfo:
-        ...
+    def to_csv(self) -> str:
+        import csv
+        from io import StringIO
 
-    @overload
-    def __getitem__(self, __s: slice) -> Self:
-        ...
+        output = StringIO()
+        writer = csv.writer(output)
+        writer.writerow(["物品 ID", "物品名称", "数量"])
+        for item_info in self:
+            writer.writerow([item_info.item_id, item_info.item.name, item_info.count])
+        return output.getvalue()
 
-    def __getitem__(self, index: SupportsIndex | slice) -> ItemInfo | Self:
-        if isinstance(index, slice):
-            return self.__class__(super().__getitem__(index))
-        return super().__getitem__(index)
+    def to_dataframe(self) -> pd.DataFrame:
+        import pandas as pd
 
-    # def __add__(self, other: ItemInfoListLike) -> Self:
-    #     return self.__class__(super().__add__(ItemInfoList.new(other)))
+        data = {
+            "物品 ID": [item_info.item_id for item_info in self],
+            "物品名称": [item_info.item.name for item_info in self],
+            "数量": [item_info.count for item_info in self],
+        }
 
-    # def __radd__(self, other: ItemInfoListLike) -> Self:
-    #     return self.__class__(ItemInfoList.new(other).__add__(self))
+        return pd.DataFrame(data)
 
-    def __str__(self) -> str:
-        if not self:
-            return f"{self.__class__.__name__}()"
-        return " ".join(map(str, self))
+    def to_clipboard(self) -> None:
+        import pyperclip
+        pyperclip.copy(self.to_csv())
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({super().__repr__()})"
+
+    def __str__(self) -> str:
+        if not self:
+            return self.__repr__()
+        return " ".join(map(str, self))
+
+    def copy(self) -> Self:
+        return self.__class__(self)
+
+    def append(self, item: ItemInfoLike, /) -> None:
+        super().append(ItemInfo.new(item))
+
+    def extend(self, items: ItemInfoListLike, /) -> None:
+        super().extend(self.__class__.new(items))
+
+    def index(self, item: ItemInfoLike, start: SupportsIndex = 0, stop: SupportsIndex = sys.maxsize, /) -> int:
+        return super().index(ItemInfo.new(item), start, stop)
+
+    def count(self, item: ItemInfoLike, /) -> int:
+        return super().count(ItemInfo.new(item))
+
+    def insert(self, index: SupportsIndex, item: ItemInfoLike, /) -> None:
+        super().insert(index, ItemInfo.new(item))
+
+    def remove(self, item: ItemInfoLike, /) -> None:
+        super().remove(ItemInfo.new(item))
+
+    @overload
+    def __getitem__(self, i: SupportsIndex, /) -> ItemInfo:
+        ...
+
+    @overload
+    def __getitem__(self, s: slice, /) -> Self:
+        ...
+
+    def __getitem__(self, index: SupportsIndex | slice, /) -> ItemInfo | Self:
+        if isinstance(index, slice):
+            return self.__class__(super().__getitem__(index))
+        else:
+            return super().__getitem__(index)
+
+    @overload
+    def __setitem__(self, key: SupportsIndex, value: ItemInfoLike, /) -> None: ...
+    ...
+
+    @overload
+    def __setitem__(self, key: slice, value: ItemInfoListLike, /) -> None: ...
+    ...
+
+    def __setitem__(self, key: SupportsIndex | slice, value: ItemInfoLike | ItemInfoListLike, /) -> None:
+        if isinstance(key, slice):
+            super().__setitem__(key, self.__class__.new(value))  # type: ignore
+        else:
+            super().__setitem__(key, ItemInfo.new(value))  # type: ignore
+
+    def __add__(self, other: ItemInfoListLike, /) -> Self:  # type: ignore
+        return self.__class__(super().__add__(ItemInfoList.new(other)))
+
+    def __radd__(self, other: ItemInfoListLike, /) -> Self:
+        return self.__class__(ItemInfoList.new(other).__add__(self))
+
+    def __iadd__(self, other: ItemInfoListLike, /) -> Self:
+        self.extend(other)
+        return self
+
+    def __mul__(self, value: SupportsIndex, /) -> Self:
+        return self.__class__(super().__mul__(value))
+
+    def __rmul__(self, value: SupportsIndex, /) -> Self:
+        return self.__class__(super().__rmul__(value))
+
+    def __imul__(self, value: SupportsIndex, /) -> Self:
+        return self.__class__(super().__imul__(value))
+
+    def __contains__(self, item: object, /) -> bool:
+        if super().__contains__(item):
+            return True
+        try:
+            return super().__contains__(ItemInfo.new(item))  # type: ignore
+        except Exception:
+            return False
+
+    def __gt__(self, other: ItemInfoListLike, /) -> bool:
+        return super().__gt__(ItemInfoList.new(other))
+
+    def __ge__(self, other: ItemInfoListLike, /) -> bool:
+        return super().__ge__(ItemInfoList.new(other))
+
+    def __lt__(self, other: ItemInfoListLike, /) -> bool:
+        return super().__lt__(ItemInfoList.new(other))
+
+    def __le__(self, other: ItemInfoListLike, /) -> bool:
+        return super().__le__(ItemInfoList.new(other))
+
+    def __eq__(self, other: object, /) -> bool:
+        if super().__eq__(other):
+            return True
+        try:
+            return super().__eq__(ItemInfoList.new(other))  # type: ignore
+        except Exception:
+            return False
