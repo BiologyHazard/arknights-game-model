@@ -87,7 +87,7 @@ class ItemInfo(NamedTuple):
         from .game_data import game_data
         return game_data.items.by_id(self.item_id)
 
-    def yituliu_value(self, *, strict: bool) -> float:
+    def yituliu_item_value(self, *, strict: bool) -> float:
         if strict and not hasattr(self.item, "yituliu_item_value"):
             raise ValueError(f"物品 {self.item_id} 没有一图流价值")
         else:
@@ -103,9 +103,6 @@ class ItemInfo(NamedTuple):
 
 
 class ItemInfoList(list[ItemInfo]):
-    # def __init__(self, items: Iterable[ItemInfoLike] = ()) -> None:
-    #     super().__init__(ItemInfo.new(item) for item in items)
-
     @classmethod
     def new(cls, arg: ItemInfoListLike) -> Self:
         if isinstance(arg, cls):
@@ -172,8 +169,8 @@ class ItemInfoList(list[ItemInfo]):
     def sort_in_place_by_sort_id(self, reverse: bool = False) -> None:
         self.sort(key=lambda item_info: item_info.item.sort_id, reverse=reverse)
 
-    def yituliu_value(self, *, strict: bool) -> float:
-        return sum(item_info.yituliu_value(strict=strict) * item_info.count for item_info in self)
+    def yituliu_item_value(self, *, strict: bool) -> float:
+        return sum(item_info.yituliu_item_value(strict=strict) * item_info.count for item_info in self)
 
     def to_csv(self) -> str:
         import csv
