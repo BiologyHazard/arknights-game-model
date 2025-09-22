@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, NamedTuple
 
 from ._raw_game_data.building_data import Char as CharInGame
 from ._raw_game_data.character_table import Character as CharacterInGame
+from ._raw_game_data.character_table import SpTargetType
 from ._raw_game_data.uniequip_table import Uniequip as UniequipInGame
 from .item_info_model import ItemInfoList
 
@@ -132,6 +133,10 @@ class Character:
         return self._raw_data.name
 
     @property
+    def sp_target_type(self) -> SpTargetType:
+        return self._raw_data.sp_target_type
+
+    @property
     def rarity(self) -> int:
         return self._raw_data.rarity
 
@@ -197,6 +202,9 @@ class Character:
         if not 1 <= 目标精英化阶段 <= self.max_elite_level:
             raise ValueError("精英化阶段不合法")
 
+        if self.sp_target_type == SpTargetType.ROGUE:
+            return ItemInfoList()
+
         from .game_data import game_data
         龙门币 = game_data.raw_data.excel.gamedata_const.evolve_gold_cost[self._raw_data.rarity][目标精英化阶段 - 1]
         item_info_list = ItemInfoList.from_name_and_count([("龙门币", 龙门币)])
@@ -231,6 +239,8 @@ class Character:
         if not 1 <= 目标等级 <= self.max_level(精英化阶段):
             raise ValueError("目标等级不合法")
         if 初始等级 >= 目标等级:
+            return ItemInfoList()
+        if self.sp_target_type == SpTargetType.ROGUE:
             return ItemInfoList()
 
         from .game_data import game_data

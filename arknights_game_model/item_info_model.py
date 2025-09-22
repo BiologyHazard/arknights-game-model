@@ -203,7 +203,7 @@ class ItemInfoList(list[ItemInfo]):
 
     def __str__(self) -> str:
         if not self:
-            return self.__repr__()
+            return f"{self.__class__.__name__}()"
         return " ".join(map(str, self))
 
     def copy(self) -> Self:

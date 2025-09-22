@@ -1,9 +1,15 @@
+from enum import Enum
 from typing import Any
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
 from ..item_info_model import ItemInfoDict
 from .model import GameDataModel
+
+
+class SpTargetType(Enum):
+    NONE = 0
+    ROGUE = 1
 
 
 class Power(GameDataModel):
@@ -121,10 +127,12 @@ class AllSkillLvlup(GameDataModel):
 
 
 class Character(GameDataModel):
+    model_config = ConfigDict(strict=False)
+
     name: str
     description: str | None
     sort_index: int
-    sp_target_type: int
+    sp_target_type: SpTargetType
     sp_target_id: str | None
     can_use_general_potential_item: bool
     can_use_activity_potential_item: bool
