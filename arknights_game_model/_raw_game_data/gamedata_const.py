@@ -1,4 +1,5 @@
-from ..item_info_model import ItemInfoDict
+from arknights_game_model.item_info_model import ItemBundle
+
 from .model import GameDataModel
 
 
@@ -74,7 +75,7 @@ class GamedataConst(GameDataModel):
     buy_ap_time_no_limit_flag: bool
     is_lmgts_enabled: bool
     legacy_time: int
-    legacy_item_list: list[ItemInfoDict]
+    legacy_item_list: list[ItemBundle]
     use_assist_social_pt: int
     use_assist_social_pt_max_count: int
     assist_be_used_social_pt: dict[str, int]

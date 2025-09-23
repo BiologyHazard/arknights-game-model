@@ -2,7 +2,8 @@ from typing import Any, Literal
 
 from pydantic import ConfigDict
 
-from ..item_info_model import ItemInfoDict
+from arknights_game_model.item_info_model import ItemBundle
+
 from .model import GameDataModel
 
 
@@ -71,7 +72,7 @@ class WorkshopFormula(GameDataModel):
     buff_type: str
     extra_outcome_rate: float
     extra_outcome_group: list[ExtraOutcome]
-    costs: list[ItemInfoDict]
+    costs: list[ItemBundle]
     require_rooms: list[RequireRoom]
     require_stages: list[Any]
 

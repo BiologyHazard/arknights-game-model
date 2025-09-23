@@ -1,5 +1,5 @@
+from arknights_game_model.item_info_model import ItemBundle
 
-from ..item_info_model import ItemInfoDict
 from .model import GameDataModel
 
 # class OccurPer(Enum):
@@ -72,12 +72,12 @@ class CharVoucherItem(GameDataModel):
 
 class UniCollectionItem(GameDataModel):
     uni_collection_item_id: str
-    unique_item: list[ItemInfoDict]
+    unique_item: list[ItemBundle]
 
 
 class ItemPackInfo(GameDataModel):
     pack_id: str
-    content: list[ItemInfoDict]
+    content: list[ItemBundle]
 
 
 class FullPotentialCharacter(GameDataModel):

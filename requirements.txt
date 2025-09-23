@@ -1,3 +1,4 @@
+lxml
 loguru
 pandas
 pydantic

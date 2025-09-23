@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING
 import pandas as pd
 
 if TYPE_CHECKING:
+    from pandas._typing import FilePath, WriteBuffer
+
     from arknights_game_model.game_data import GameData
 
 
@@ -21,11 +23,11 @@ mod_online_time_url = "https://prts.wiki/w/%E5%B9%B2%E5%91%98%E6%A8%A1%E7%BB%84%
 """ <https://prts.wiki/w/干员模组一览/上线时间> """
 
 
-def fetch_data_from_prts_wiki(save_path: Path | None) -> pd.DataFrame:
+def fetch_data_from_prts_wiki(save_to: FilePath | WriteBuffer[bytes] | WriteBuffer[str] | None) -> pd.DataFrame:
     df = pd.read_html(char_online_time_url)[0]
 
-    if save_path is not None:
-        df.to_csv(save_path, index=False)
+    if save_to is not None:
+        df.to_csv(save_to, index=False)
 
     return df
 
@@ -58,3 +60,9 @@ def patch_to(game_data: GameData, path: Path) -> None:
         logger.warning(f"以下干员在 character_table 中，但不在 PRTS Wiki 上线时间表中：\n{', '.join(not_in_wiki_names)}")
     if not_in_table_names:
         logger.warning(f"以下干员在 PRTS Wiki 上线时间表中，但不在 character_table 中：\n{', '.join(not_in_table_names)}")
+
+
+if __name__ == "__main__":
+    import sys
+
+    df = fetch_data_from_prts_wiki(sys.stdout)

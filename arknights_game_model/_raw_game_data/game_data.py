@@ -9,7 +9,7 @@ from .character_table import CharacterTable
 from .gamedata_const import GamedataConst
 from .item_table import ItemTable
 from .model import GameDataModel
-from .uniequip_table import UniequipTable
+from .uniequip_table import UniEquipTable
 
 
 class Excel(GameDataModel):
@@ -19,7 +19,7 @@ class Excel(GameDataModel):
     character_table: CharacterTable
     gamedata_const: GamedataConst
     item_table: ItemTable
-    uniequip_table: UniequipTable
+    uniequip_table: UniEquipTable
 
 
 class ArknightsGameData(GameDataModel):
@@ -35,7 +35,7 @@ data_structure = {
         "gamedata_const": "json",
         "item_table": "json",
         "uniequip_table": "json",
-    }
+    },
 }
 
 
@@ -46,7 +46,7 @@ def _load_recursive(path: Path, structure: dict[str, Any]) -> dict[str, Any]:
             data[key] = _load_recursive(path / key, value)  # type: ignore
         elif value == "json":
             file_path = path / f"{key}.{value}"
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with file_path.open("r", encoding="utf-8") as f:
                 data[key] = json.load(f)
     return data
 

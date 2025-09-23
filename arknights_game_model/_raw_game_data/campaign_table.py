@@ -1,14 +1,14 @@
-
 from typing import Any
 
-from ..item_info_model import ItemInfoDict
+from arknights_game_model.item_info_model import ItemBundle
+
 from .model import GameDataModel
 
 
 class BreakLadder(GameDataModel):
     kill_cnt: int
     break_fee_add: int
-    rewards: list[ItemInfoDict]
+    rewards: list[ItemBundle]
 
 
 class Campaign(GameDataModel):

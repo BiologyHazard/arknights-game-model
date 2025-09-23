@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import sys
 from collections import defaultdict
-from collections.abc import Iterable, Mapping, Callable
+from collections.abc import Callable, Iterable, Mapping
 from typing import TYPE_CHECKING, NamedTuple, Self, SupportsIndex, TypedDict, overload
 
-type ItemInfoLike = ItemInfo | tuple[str, int | float] | str | ItemInfoDict
+type ItemInfoLike = ItemInfo | tuple[str, int | float] | str | ItemBundle
 type ItemInfoListLike = ItemInfoList | Iterable[ItemInfoLike] | str
 
 if TYPE_CHECKING:
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from .item_model import Item
 
 
-class ItemInfoDict(TypedDict):
+class ItemBundle(TypedDict):
     id: str
     count: int
     type: str
@@ -60,9 +60,8 @@ class ItemInfo(NamedTuple):
             return cls(*arg)
 
     @classmethod
-    def from_item_info_dict(cls, item_info_dict: ItemInfoDict) -> Self:
-        return cls(item_id=item_info_dict["id"],
-                   count=item_info_dict["count"])
+    def from_item_info_dict(cls, item_info_dict: ItemBundle) -> Self:
+        return cls(item_id=item_info_dict["id"], count=item_info_dict["count"])
 
     @classmethod
     def from_name_and_count(cls, name: str, count: int | float = 1) -> Self:
@@ -228,12 +227,10 @@ class ItemInfoList(list[ItemInfo]):
         super().remove(ItemInfo.new(item))
 
     @overload
-    def __getitem__(self, i: SupportsIndex, /) -> ItemInfo:
-        ...
+    def __getitem__(self, i: SupportsIndex, /) -> ItemInfo: ...
 
     @overload
-    def __getitem__(self, s: slice, /) -> Self:
-        ...
+    def __getitem__(self, s: slice, /) -> Self: ...
 
     def __getitem__(self, index: SupportsIndex | slice, /) -> ItemInfo | Self:
         if isinstance(index, slice):
@@ -243,11 +240,9 @@ class ItemInfoList(list[ItemInfo]):
 
     @overload
     def __setitem__(self, key: SupportsIndex, value: ItemInfoLike, /) -> None: ...
-    ...
 
     @overload
     def __setitem__(self, key: slice, value: ItemInfoListLike, /) -> None: ...
-    ...
 
     def __setitem__(self, key: SupportsIndex | slice, value: ItemInfoLike | ItemInfoListLike, /) -> None:
         if isinstance(key, slice):

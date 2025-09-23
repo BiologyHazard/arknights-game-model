@@ -1,10 +1,13 @@
-from pydantic_extra_types.color import Color
+from __future__ import annotations
 
-from ..item_info_model import ItemInfoDict
+from pydantic_extra_types.color import Color  # noqa: TC002
+
+from arknights_game_model.item_info_model import ItemBundle  # noqa: TC001
+
 from .model import GameDataModel
 
 
-class Uniequip(GameDataModel):
+class UniEquipData(GameDataModel, strict=False):
     uni_equip_id: str
     uni_equip_name: str
     uni_equip_icon: str
@@ -21,7 +24,7 @@ class Uniequip(GameDataModel):
     unlock_level: int
     mission_list: list[str]
     unlock_favors: dict[str, int]
-    item_cost: dict[str, list[ItemInfoDict]]
+    item_cost: dict[int, list[ItemBundle]]
     type: str
     uni_equip_get_time: int
     uni_equip_show_end: int
@@ -33,7 +36,7 @@ class Uniequip(GameDataModel):
     char_color: Color | None
 
 
-class Mission(GameDataModel):
+class UniEquipMissionData(GameDataModel):
     template: str
     desc: str
     param_list: list[str]
@@ -43,36 +46,36 @@ class Mission(GameDataModel):
     jump_stage_id: str | None
 
 
-class SubProf(GameDataModel):
+class SubProfessionData(GameDataModel):
     sub_profession_id: str
     sub_profession_name: str
     sub_profession_catagory: int
 
 
-class EquipTypeInfo(GameDataModel):
+class UniEquipTypeInfo(GameDataModel):
     uni_equip_type_name: str
     sort_id: int
     is_special: bool
     is_initial: bool
 
 
-class EquipTrackInfo(GameDataModel):
+class UniEquipTrack(GameDataModel):
     char_id: str
     equip_id: str
     type: int
     archive_show_time_end: int
 
 
-class EquipTrack(GameDataModel):
+class UniEquipTimeInfo(GameDataModel):
     time_stamp: int
-    track_list: list[EquipTrackInfo]
+    track_list: list[UniEquipTrack]
 
 
-class UniequipTable(GameDataModel):
-    equip_dict: dict[str, Uniequip]
-    mission_list: dict[str, Mission]
-    sub_prof_dict: dict[str, SubProf]
+class UniEquipTable(GameDataModel):
+    equip_dict: dict[str, UniEquipData]
+    mission_list: dict[str, UniEquipMissionData]
+    sub_prof_dict: dict[str, SubProfessionData]
     sub_prof_to_prof_dict: dict[str, int]
     char_equip: dict[str, list[str]]
-    equip_type_infos: list[EquipTypeInfo]
-    equip_track_dict: list[EquipTrack]
+    equip_type_infos: list[UniEquipTypeInfo]
+    equip_track_dict: list[UniEquipTimeInfo]

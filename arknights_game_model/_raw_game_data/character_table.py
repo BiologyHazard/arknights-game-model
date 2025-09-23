@@ -1,18 +1,20 @@
+from __future__ import annotations
+
 from enum import Enum
-from typing import Any
 
 from pydantic import ConfigDict, Field
 
-from ..item_info_model import ItemInfoDict
+from arknights_game_model.item_info_model import ItemBundle
+
 from .model import GameDataModel
 
 
-class SpTargetType(Enum):
+class SpecialOperatorTargetType(Enum):
     NONE = 0
     ROGUE = 1
 
 
-class Power(GameDataModel):
+class PowerData(GameDataModel):
     nation_id: str | None
     group_id: str | None
     team_id: str | None
@@ -23,29 +25,29 @@ class UnlockCondition(GameDataModel):
     level: int
 
 
-class Blackboard(GameDataModel):
+class BlackboardDataPair(GameDataModel):
     key: str
     value: float
     value_str: str | None
 
 
-class TraitCandidate(GameDataModel):
+class TraitData(GameDataModel):
     unlock_condition: UnlockCondition
     required_potential_rank: int
-    blackboard: list[Blackboard]
+    blackboard: list[BlackboardDataPair]
     override_descripton: str | None
     prefab_key: str | None
     range_id: str | None
 
 
-class Trait(GameDataModel):
-    candidates: list[TraitCandidate]
+class TraitDataBundle(GameDataModel):
+    candidates: list[TraitData]
 
 
-class AttributeKeyFrameData(GameDataModel):
+class AttributesData(GameDataModel):
     max_hp: int
     atk: int
-    def_: int = Field(alias='def')
+    def_: int = Field(alias="def")
     magic_resistance: float
     cost: int
     block_cnt: int
@@ -73,66 +75,87 @@ class AttributeKeyFrameData(GameDataModel):
 
 class AttributeKeyFrame(GameDataModel):
     level: int
-    data: AttributeKeyFrameData
+    data: AttributesData
 
 
-class Phase(GameDataModel):
+class PhaseData(GameDataModel):
     character_prefab_key: str
     range_id: str | None
     max_level: int
     attributes_key_frames: list[AttributeKeyFrame]
-    evolve_cost: list[ItemInfoDict]
+    evolve_cost: list[ItemBundle]
 
 
-class LevelUpCostCond(GameDataModel):
+class SpecializeLevelData(GameDataModel):
     unlock_cond: UnlockCondition
     lvl_up_time: int
-    level_up_cost: list[ItemInfoDict]
+    level_up_cost: list[ItemBundle]
 
 
-class Skill(GameDataModel):
+class MainSkill(GameDataModel):
     skill_id: str | None
     override_prefab_key: str | None
     override_token_key: str | None
+    level_up_cost_cond: list[SpecializeLevelData]
     unlock_cond: UnlockCondition
-    level_up_cost_cond: list[LevelUpCostCond]
 
 
-class TalentCandidate(GameDataModel):
+class TalentData(GameDataModel):
     unlock_condition: UnlockCondition
     required_potential_rank: int
     prefab_key: str
     name: str | None
     description: str | None
     range_id: str | None
-    blackboard: list[Blackboard]
+    blackboard: list[BlackboardDataPair]
     token_key: str | None
     is_hide_talent: bool
 
 
-class Talent(GameDataModel):
-    candidates: list[TalentCandidate]
+class TalentDataBundle(GameDataModel):
+    candidates: list[TalentData]
+
+
+class AttributeModifier(GameDataModel):
+    attribute_type: int
+    formula_item: int
+    value: float
+    load_from_blackboard: bool
+    fetch_base_value_from_source_entity: bool
+
+
+class AttributeModifierData(GameDataModel):
+    abnormal_flags: list[int] = Field(max_length=0)
+    abnormal_immunes: list[int] = Field(max_length=0)
+    abnormal_antis: list[int] = Field(max_length=0)
+    abnormal_combos: list[int] = Field(max_length=0)
+    abnormal_combo_immunes: list[int] = Field(max_length=0)
+    attribute_modifiers: list[AttributeModifier]
+
+
+class ExternalBuff(GameDataModel):
+    attributes: AttributeModifierData
 
 
 class PotentialRank(GameDataModel):
     type: int
     description: str
-    buff: dict[str, Any] | None
-    equivalent_cost: list = Field(max_length=0)
+    buff: ExternalBuff | None
+    equivalent_cost: list[ItemBundle] = Field(max_length=0)
 
 
 class AllSkillLvlup(GameDataModel):
     unlock_cond: UnlockCondition
-    lvl_up_cost: list[ItemInfoDict]
+    lvl_up_cost: list[ItemBundle]
 
 
-class Character(GameDataModel):
+class CharacterData(GameDataModel):
     model_config = ConfigDict(strict=False)
 
     name: str
     description: str | None
     sort_index: int
-    sp_target_type: SpTargetType
+    sp_target_type: SpecialOperatorTargetType
     sp_target_id: str | None
     can_use_general_potential_item: bool
     can_use_activity_potential_item: bool
@@ -142,8 +165,8 @@ class Character(GameDataModel):
     nation_id: str | None
     group_id: str | None
     team_id: str | None
-    main_power: Power
-    sub_power: list[Power]
+    main_power: PowerData
+    sub_power: list[PowerData]
     display_number: str | None
     appellation: str
     position: str
@@ -157,14 +180,14 @@ class Character(GameDataModel):
     rarity: int
     profession: str
     sub_profession_id: str
-    trait: Trait | None
-    phases: list[Phase]
+    trait: TraitDataBundle | None
+    phases: list[PhaseData]
     display_token_dict: dict[str, bool]
-    skills: list[Skill]
-    talents: list[Talent]
+    skills: list[MainSkill]
+    talents: list[TalentDataBundle]
     potential_ranks: list[PotentialRank]
     favor_key_frames: list[AttributeKeyFrame]
     all_skill_lvlup: list[AllSkillLvlup]
 
 
-type CharacterTable = dict[str, Character]
+type CharacterTable = dict[str, CharacterData]

@@ -1,18 +1,19 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
 from enum import Enum
 from functools import lru_cache
 from typing import TYPE_CHECKING, NamedTuple
 
-from ._raw_game_data.building_data import Char as CharInGame
-from ._raw_game_data.character_table import Character as CharacterInGame
-from ._raw_game_data.character_table import SpTargetType
-from ._raw_game_data.uniequip_table import Uniequip as UniequipInGame
+from ._raw_game_data.character_table import CharacterData, SpecialOperatorTargetType
 from .item_info_model import ItemInfoList
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from pandas import Timestamp
+
+    from ._raw_game_data.character_table import CharacterData
+    from ._raw_game_data.uniequip_table import UniEquipData
 
 
 class Profession(NamedTuple):
@@ -36,10 +37,10 @@ class Professions(Enum):
 
 
 class UniEquip:
-    _raw_data: UniequipInGame
+    _raw_data: UniEquipData
     _online_timestamp: int
 
-    def __init__(self, raw_data: UniequipInGame, online_timestamp: int | None = None):
+    def __init__(self, raw_data: UniEquipData, online_timestamp: int | None = None):
         self._raw_data = raw_data
         if online_timestamp is not None:
             self._online_timestamp = online_timestamp
@@ -86,10 +87,10 @@ class UniEquip:
         """等级范围 `[1, 3]`"""
         if not 1 <= 目标等级 <= 3:
             raise ValueError("目标等级不合法")
-        if str(目标等级) not in self._raw_data.item_cost:
+        if 目标等级 not in self._raw_data.item_cost:
             raise ValueError(f"模组 {self!r} 无法升级到等级 {目标等级}")
 
-        return ItemInfoList.new(self._raw_data.item_cost[str(目标等级)])
+        return ItemInfoList.new(self._raw_data.item_cost[目标等级])
 
     def 升级消耗(self, 初始等级: int | None = None, 目标等级: int | None = None) -> ItemInfoList:
         """等级范围 `[0, 3]`"""
@@ -109,11 +110,11 @@ class UniEquip:
 
 class Character:
     _id: str
-    _raw_data: CharacterInGame
+    _raw_data: CharacterData
     _is_patch_char: bool
     _cn_online_time: Timestamp
 
-    def __init__(self, id: str, raw_data: CharacterInGame, is_patch_char: bool, cn_online_time: Timestamp | None = None):
+    def __init__(self, id: str, raw_data: CharacterData, is_patch_char: bool, cn_online_time: Timestamp | None = None):
         self._id = id
         self._raw_data = raw_data
         self._is_patch_char = is_patch_char
@@ -133,7 +134,7 @@ class Character:
         return self._raw_data.name
 
     @property
-    def sp_target_type(self) -> SpTargetType:
+    def sp_target_type(self) -> SpecialOperatorTargetType:
         return self._raw_data.sp_target_type
 
     @property
@@ -202,7 +203,7 @@ class Character:
         if not 1 <= 目标精英化阶段 <= self.max_elite_level:
             raise ValueError("精英化阶段不合法")
 
-        if self.sp_target_type == SpTargetType.ROGUE:
+        if self.sp_target_type == SpecialOperatorTargetType.ROGUE:
             return ItemInfoList()
 
         from .game_data import game_data
@@ -240,7 +241,7 @@ class Character:
             raise ValueError("目标等级不合法")
         if 初始等级 >= 目标等级:
             return ItemInfoList()
-        if self.sp_target_type == SpTargetType.ROGUE:
+        if self.sp_target_type == SpecialOperatorTargetType.ROGUE:
             return ItemInfoList()
 
         from .game_data import game_data
@@ -357,10 +358,8 @@ class Character:
             在初始模组等级字典中 = uniequip_id in 初始模组等级字典 or uniequip.type_name2 in 初始模组等级字典
             在目标模组等级字典中 = uniequip_id in 目标模组等级字典 or uniequip.type_name2 in 目标模组等级字典
             if 在初始模组等级字典中 and 在目标模组等级字典中:
-                初始模组等级 = (初始模组等级字典[uniequip_id] if uniequip_id in 初始模组等级字典
-                          else 初始模组等级字典[uniequip.type_name2])  # type: ignore
-                目标模组等级 = (目标模组等级字典[uniequip_id] if uniequip_id in 目标模组等级字典
-                          else 目标模组等级字典[uniequip.type_name2])  # type: ignore
+                初始模组等级 = 初始模组等级字典[uniequip_id] if uniequip_id in 初始模组等级字典 else 初始模组等级字典[uniequip.type_name2]  # type: ignore
+                目标模组等级 = 目标模组等级字典[uniequip_id] if uniequip_id in 目标模组等级字典 else 目标模组等级字典[uniequip.type_name2]  # type: ignore
                 item_info_list.extend(self.模组升级消耗(uniequip_id, 初始模组等级, 目标模组等级))
             elif 在初始模组等级字典中 or 在目标模组等级字典中:
                 raise ValueError(f"模组 {uniequip!r} 的初始等级和目标等级需同时指定")

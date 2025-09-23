@@ -4,7 +4,7 @@ from itertools import accumulate
 
 def escape_description(s):
     """删除所有的HTML标签"""
-    return re.sub(r'<[^>]*?>', '', s)
+    return re.sub(r"<[^>]*?>", "", s)
 
 
 def 计算累计消耗(干员升级消耗: list[list[int]]) -> list[list[int]]:
