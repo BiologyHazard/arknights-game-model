@@ -15,6 +15,13 @@ class CreatorIdentifier(GameDataModel):
     i18n_description: dict[str, Any]  # 空字典
 
 
+class Pendant(GameDataModel):
+    id: int
+    icon_url: str
+    title: str
+    description: str
+
+
 class User(GameDataModel):
     id: str
     nickname: str
@@ -34,6 +41,7 @@ class User(GameDataModel):
     hg_id: str
     creator_identifiers: list[CreatorIdentifier]
     score_info_list: list[Any]  # 空列表
+    pendant: Pendant | None = None
 
 
 class Relation(GameDataModel):
