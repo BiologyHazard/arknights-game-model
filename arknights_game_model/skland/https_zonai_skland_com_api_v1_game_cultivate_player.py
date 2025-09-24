@@ -1,4 +1,4 @@
-from pydantic import ConfigDict
+from pydantic import Field
 
 from arknights_game_model._raw_game_data.model import GameDataModel
 
@@ -24,10 +24,8 @@ class Character(GameDataModel):
 
 
 class Item(GameDataModel):
-    model_config = ConfigDict(strict=False)
-
     id: str
-    count: int
+    count: int = Field(strict=False)
 
 
 class Data(GameDataModel):
