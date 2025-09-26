@@ -194,8 +194,8 @@ class Trading(BaseRoom):
 
 
 class Dormitory(BaseRoom):
-    slot_id: str
-    level: int
+    # slot_id: str
+    # level: int
     chars: list[DormitoryChar]
     comfort: int
 
@@ -210,16 +210,16 @@ class Clue(GameDataModel):
     share_complete_time: int
 
 
-class Meeting(GameDataModel):
+class Meeting(BaseRoom):
     chars: list[MeetingChar]
     clue: Clue
     last_update_time: int
     complete_work_time: int
 
 
-class Hire(GameDataModel):
-    slot_id: str
-    level: int
+class Hire(BaseRoom):
+    # slot_id: str
+    # level: int
     chars: list[HireChar]
     state: int
     refresh_count: int
@@ -240,12 +240,10 @@ class Trainer(GameDataModel):
     last_ap_add_time: int
 
 
-class Training(GameDataModel):
-    slot_id: str
-    level: int
+class Training(BaseRoom):
     trainee: Trainee
     trainer: Trainer
-    remain_point: int
+    remain_point: float
     speed: float
     last_update_time: int
     remain_secs: int
@@ -263,22 +261,22 @@ class Furniture(GameDataModel):
     total: int
 
 
-class Elevator(GameDataModel):
-    slot_id: str
+class Elevator(BaseRoom):
+    # slot_id: str
     slot_state: int
-    level: int
+    # level: int
 
 
-class Corridor(GameDataModel):
-    slot_id: str
+class Corridor(BaseRoom):
+    # slot_id: str
     slot_state: int
-    level: int
+    # level: int
 
 
-class Control(GameDataModel):
-    slot_id: str
+class Control(BaseRoom):
+    # slot_id: str
     slot_state: int
-    level: int
+    # level: int
     chars: list[ControlChar]
 
 
@@ -289,8 +287,8 @@ class Building(GameDataModel):
     tradings: list[Trading]
     dormitories: list[Dormitory]
     meeting: Meeting
-    hire: Hire
-    training: Training
+    hire: Hire | None  # 可能为 None
+    training: Training | None  # 可能为 None
     labor: Labor
     furniture: Furniture
     elevators: list[Elevator]
@@ -426,6 +424,18 @@ class SkinInfo(GameDataModel):
     char_id: str
 
 
+class StageInfo(GameDataModel):
+    id: str
+    code: str
+    name: str
+    zone_id: str
+    diff_group: str
+    stage_type: str
+    danger_level: str
+    ap_cost: int
+    difficulty: str
+
+
 class ActivityInfo(GameDataModel):
     """活动信息"""
     id: str
@@ -476,6 +486,7 @@ class EquipmentInfo(GameDataModel):
     id: str
     name: str
     type_icon: str
+    type_name2: str | None = None
     shining_color: str
 
 
@@ -493,8 +504,12 @@ class CharAssetList(GameDataModel):
     ids: list[str]
 
 
-class ActivityBanner(GameDataModel):
-    pass
+class SkinAssetList(GameDataModel):
+    ids: list[str]
+
+
+class ActivityBannerList(GameDataModel):
+    list: list[Any]  # 空列表
 
 
 class BossRushRecord(GameDataModel):
@@ -560,6 +575,7 @@ class Data(GameDataModel):
     activity: list[Activity]
     char_info_map: dict[str, CharInfo]
     skin_info_map: dict[str, SkinInfo]
+    stage_info_map: dict[str, StageInfo]
     activity_info_map: dict[str, ActivityInfo]
     tower_info_map: dict[str, TowerInfo]
     rogue_info_map: dict[str, RogueInfo]
@@ -569,8 +585,9 @@ class Data(GameDataModel):
     manufacture_formula_info_map: dict[str, ManufactureFormulaInfo]
     char_assets: list[str]
     skin_assets: list[str]
-    char_asset_list: CharAssetList
-    activity_banner_list: list[ActivityBanner]
+    char_asset_list: CharAssetList | None = None  # 可能不存在
+    skin_asset_list: SkinAssetList | None = None  # 可能不存在
+    activity_banner_list: ActivityBannerList
     boss_rush: list[BossRush]
     banner_list: list[Banner]
     sandbox: list[Sandbox]
