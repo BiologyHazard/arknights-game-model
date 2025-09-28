@@ -16,11 +16,11 @@ def patch_to(game_data: GameData, path: Path) -> None:
     with open(path, 'r', encoding='utf-8') as f:
         obj = json.load(f)
 
-    if "data" in obj:
+    if "data" in obj:  # 来自后端
         item_id_to_value: dict[str, float] = {x["itemId"]: x["itemValueAp"] for x in obj["data"]}
         item_id_to_name: dict[str, str] = {x["itemId"]: x["itemName"] for x in obj["data"]}
 
-    else:
+    else:  # 来自前端
         item_id_to_value = {x["id"]: x["apValue"] for x in obj}
         item_id_to_name = {x["id"]: x["name"] for x in obj}
 

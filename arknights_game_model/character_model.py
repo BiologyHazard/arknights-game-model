@@ -178,7 +178,7 @@ class Character:
         from .game_data import game_data
         return game_data.raw_data.excel.uniequip_table.char_equip.get(self._id, [])
 
-    def uniquips(self) -> UniEquipDict:
+    def uniequips(self) -> UniEquipDict:
         from .game_data import game_data
         return UniEquipDict((uniequip_id, game_data.uniequips[uniequip_id]) for uniequip_id in self.uniequip_ids())
 
@@ -187,23 +187,26 @@ class Character:
             type_name = "A"
         if type_name == "Δ":
             type_name = "D"
-        for uniequip in self.uniquips().values():
+        for uniequip in self.uniequips().values():
             if type_name.upper() in (uniequip.type_name1, uniequip.type_name2):
                 return uniequip
         raise ValueError(f"干员 {self.name} 未找到类型为 {type_name!r} 的模组")
 
     def get_uniequip(self, id_or_type: str) -> UniEquip:
-        if id_or_type in self.uniquips():
-            return self.uniquips()[id_or_type]
+        if id_or_type in self.uniequips():
+            return self.uniequips()[id_or_type]
         else:
             return self.get_uniequip_by_type(id_or_type)
 
     def 精英化一次消耗(self, 目标精英化阶段: int) -> ItemInfoList:
-        """精英化阶段范围 `[1, 2]`"""
+        """
+        精英化阶段范围 `[1, 2]`
+        升变干员和特勤干员不计算精英化消耗
+        """
         if not 1 <= 目标精英化阶段 <= self.max_elite_level:
             raise ValueError("精英化阶段不合法")
 
-        if self.sp_target_type == SpecialOperatorTargetType.ROGUE:
+        if self.is_patch_char or self.sp_target_type == SpecialOperatorTargetType.ROGUE:
             return ItemInfoList()
 
         from .game_data import game_data
@@ -213,7 +216,10 @@ class Character:
         return item_info_list
 
     def 精英化消耗(self, 初始精英化阶段: int | None = None, 目标精英化阶段: int | None = None) -> ItemInfoList:
-        """精英化阶段范围 `[0, 2]`"""
+        """
+        精英化阶段范围 `[0, 2]`
+        升变干员和特勤干员不计算精英化消耗
+        """
         if 初始精英化阶段 is None:
             初始精英化阶段 = 0
         if 目标精英化阶段 is None:
@@ -226,8 +232,9 @@ class Character:
 
     def 等级升级一次消耗(self, 精英化阶段: int, 初始等级: int | None = None, 目标等级: int | None = None) -> ItemInfoList:
         """
-        计算从初始等级升级到目标等级的消耗，含升级所需的EXP和龙门币
+        计算从初始等级升级到目标等级的消耗，含升级所需的 EXP 和龙门币
         精英化阶段范围 `[0, 2]`
+        升变干员和特勤干员不计算等级升级消耗
         """
         if 初始等级 is None:
             初始等级 = 1
@@ -241,7 +248,7 @@ class Character:
             raise ValueError("目标等级不合法")
         if 初始等级 >= 目标等级:
             return ItemInfoList()
-        if self.sp_target_type == SpecialOperatorTargetType.ROGUE:
+        if self.is_patch_char or self.sp_target_type == SpecialOperatorTargetType.ROGUE:
             return ItemInfoList()
 
         from .game_data import game_data
@@ -250,7 +257,10 @@ class Character:
         return ItemInfoList.from_name_and_count([("EXP", EXP), ("龙门币", 龙门币)])
 
     def 等级升级消耗(self, 初始精英化阶段: int | None = None, 初始等级: int | None = None, 目标精英化阶段: int | None = None, 目标等级: int | None = None) -> ItemInfoList:
-        """计算从初始等级升级到目标等级的消耗，仅含升级所需的EXP和龙门币"""
+        """
+        计算从初始等级升级到目标等级的消耗，仅含升级所需的 EXP 和龙门币，不含精英化的消耗
+        升变干员和特勤干员不计算等级升级消耗
+        """
         if 初始精英化阶段 is None:
             初始精英化阶段 = 0
         if 目标精英化阶段 is None:
@@ -264,22 +274,34 @@ class Character:
         return item_info_list
 
     def 精英化等级升级消耗(self, 初始精英化阶段: int | None = None, 初始等级: int | None = None, 目标精英化阶段: int | None = None, 目标等级: int | None = None) -> ItemInfoList:
-        """计算从初始等级升级到目标等级的消耗，含升级所需的EXP和龙门币，以及精英化所需的龙门币、精英材料"""
+        """
+        计算从初始等级升级到目标等级的消耗，含升级所需的 EXP 和龙门币，以及精英化所需的龙门币、精英材料
+        升变干员和特勤干员不计算精英化、等级升级消耗
+        """
         item_info_list = ItemInfoList()
         item_info_list.extend(self.精英化消耗(初始精英化阶段, 目标精英化阶段))
         item_info_list.extend(self.等级升级消耗(初始精英化阶段, 初始等级, 目标精英化阶段, 目标等级))
         return item_info_list
 
     def 通用技能升级一次消耗(self, 目标技能等级: int) -> ItemInfoList:
-        """等级范围 `[2, 7]`"""
+        """
+        等级范围 `[2, 7]`
+        升变干员不计算通用技能升级消耗
+        """
         if self.skill_count == 0:
             raise ValueError("该干员没有技能")
         if not 2 <= 目标技能等级 <= 7:
             raise ValueError("目标技能等级不合法")
+        if self.is_patch_char:
+            return ItemInfoList()
+
         return ItemInfoList.new(self._raw_data.all_skill_lvlup[目标技能等级 - 2].lvl_up_cost)
 
     def 通用技能升级消耗(self, 初始技能等级: int | None = None, 目标技能等级: int | None = None) -> ItemInfoList:
-        """等级范围 `[1, 7]`"""
+        """
+        等级范围 `[1, 7]`
+        升变干员不计算通用技能升级消耗
+        """
         if 初始技能等级 is None:
             初始技能等级 = 1
         if 目标技能等级 is None:
@@ -338,11 +360,16 @@ class Character:
         目标技能专精等级列表: Iterable[int | None] | None = None,
         目标模组等级字典: dict[str, int | None] | None = None,
     ) -> ItemInfoList:
+        """
+        未提供参数，则视为拉满
+        升变干员不计算精英化、等级升级、通用技能升级消耗
+        特勤干员不计算精英化、等级升级消耗
+        """
         if 初始技能专精等级列表 is None:
             初始技能专精等级列表 = [None] * self.skill_count
         if 目标技能专精等级列表 is None:
             目标技能专精等级列表 = [None] * self.skill_count
-        专属模组ID列表 = [uniequip_id for uniequip_id, uniequip in self.uniquips().items() if not uniequip.is_original]
+        专属模组ID列表 = [uniequip_id for uniequip_id, uniequip in self.uniequips().items() if not uniequip.is_original]
         if 初始模组等级字典 is None:
             初始模组等级字典 = dict.fromkeys(专属模组ID列表, None)
         if 目标模组等级字典 is None:
@@ -352,7 +379,7 @@ class Character:
         item_info_list.extend(self.通用技能升级消耗(初始技能等级, 目标技能等级))
         for 技能序号, (初始技能专精等级, 目标技能专精等级) in enumerate(zip(初始技能专精等级列表, 目标技能专精等级列表), start=1):
             item_info_list.extend(self.技能专精消耗(技能序号, 初始技能专精等级, 目标技能专精等级))
-        for uniequip_id, uniequip in self.uniquips().items():
+        for uniequip_id, uniequip in self.uniequips().items():
             if uniequip.is_original:
                 continue
             在初始模组等级字典中 = uniequip_id in 初始模组等级字典 or uniequip.type_name2 in 初始模组等级字典
@@ -366,15 +393,12 @@ class Character:
         return item_info_list
 
     def 拉满消耗(self) -> ItemInfoList:
-        """
-        未对升变干员特殊处理
-        """
         item_info_list = ItemInfoList()
         item_info_list.extend(self.精英化等级升级消耗())
         item_info_list.extend(self.通用技能升级消耗())
         for 技能序号 in range(1, self.skill_count + 1):
             item_info_list.extend(self.技能专精消耗(技能序号))
-        for uniequip in self.uniquips().values():
+        for uniequip in self.uniequips().values():
             item_info_list.extend(uniequip.升级消耗())
         return item_info_list
 

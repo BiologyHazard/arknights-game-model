@@ -30,14 +30,7 @@ class CharacterDict(dict[str, Character]):
     def 全干员拉满消耗(self) -> ItemInfoList:
         item_info_list = ItemInfoList()
         for character in self.values():
-            if character.is_patch_char:
-                # 升变干员
-                for skill_index in range(1, character.skill_count + 1):
-                    item_info_list.extend(character.技能专精消耗(skill_index))
-                for uniequip in character.uniquips().values():
-                    item_info_list.extend(uniequip.升级消耗())
-            else:
-                item_info_list.extend(character.拉满消耗())
+            item_info_list.extend(character.拉满消耗())
         return item_info_list
 
     def __repr__(self) -> str:

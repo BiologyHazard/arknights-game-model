@@ -85,7 +85,12 @@ class Skill(GameDataModel):
 class Equip(GameDataModel):
     id: str
     level: int
+    """
+    模组等级
+    如果模组未解锁，则 `locked` 为 `True` 且 `level` 为 1
+    """
     locked: bool
+    """如果模组未解锁，则 `locked` 为 `True` 且 `level` 为 1"""
 
 
 class Char(GameDataModel):
@@ -97,7 +102,9 @@ class Char(GameDataModel):
     main_skill_lvl: int
     skills: list[Skill]
     equip: list[Equip]
+    """如果账号很久没登录，可能不包含该干员的全部模组"""
     favor_percent: int
+    """信赖值百分比，范围 0-200"""
     default_skill_id: str
     gain_time: int
     default_equip_id: str
@@ -241,8 +248,10 @@ class Trainer(GameDataModel):
 
 
 class Training(BaseRoom):
-    trainee: Trainee
-    trainer: Trainer
+    # slot_id: str
+    # level: int
+    trainee: Trainee | None
+    trainer: Trainer | None
     remain_point: float
     speed: float
     last_update_time: int
@@ -251,6 +260,7 @@ class Training(BaseRoom):
 
 
 class Labor(GameDataModel):
+    """无人机"""
     max_value: int
     value: int
     last_update_time: int
@@ -262,12 +272,14 @@ class Furniture(GameDataModel):
 
 
 class Elevator(BaseRoom):
+    """电梯"""
     # slot_id: str
     slot_state: int
     # level: int
 
 
 class Corridor(BaseRoom):
+    """走廊"""
     # slot_id: str
     slot_state: int
     # level: int
@@ -286,10 +298,14 @@ class Building(GameDataModel):
     manufactures: list[Manufacture]
     tradings: list[Trading]
     dormitories: list[Dormitory]
-    meeting: Meeting
+    meeting: Meeting | None  # 可能为 None
+    """会客室"""
     hire: Hire | None  # 可能为 None
+    """办公室"""
     training: Training | None  # 可能为 None
+    """训练室"""
     labor: Labor
+    """无人机"""
     furniture: Furniture
     elevators: list[Elevator]
     corridors: list[Corridor]
@@ -299,11 +315,11 @@ class Building(GameDataModel):
 class RecruitItem(GameDataModel):
     """公开招募格子信息"""
     start_ts: int
-    """公开招募开始的时间戳"""
+    """公开招募开始的时间戳，-1 表示未开始"""
     finish_ts: int
-    """公开招募结束的时间戳"""
+    """公开招募结束的时间戳，-1 表示未开始"""
     state: int
-    """2 表示正在招募，1 表示空闲，推测 0 表示未解锁（？）"""
+    """2 表示正在招募或者招募完成，1 表示空闲，0 表示未解锁该格子"""
 
 
 class CampaignRecord(GameDataModel):
