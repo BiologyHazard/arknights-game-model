@@ -214,7 +214,12 @@ class Clue(GameDataModel):
     need_receive: int
     board: list[Any]
     sharing: bool
+    """
+    TODO: 如果处于交流结束但未领取状态，会如何？
+    观测到：实际未处于线索交流状态下，`sharing` 为 `True`，`share_complete_time` 为 0 的样本，这是为什么呢？
+    """
     share_complete_time: int
+    """TODO: 如果处于交流结束但未领取状态，会如何？"""
 
 
 class Meeting(BaseRoom):
@@ -222,6 +227,7 @@ class Meeting(BaseRoom):
     clue: Clue
     last_update_time: int
     complete_work_time: int
+    """下一份线索搜集完成时间戳"""
 
 
 class Hire(BaseRoom):
@@ -231,6 +237,7 @@ class Hire(BaseRoom):
     state: int
     refresh_count: int
     complete_work_time: int
+    """-1 表示当前公招刷新次数已满"""
     slot_state: int
 
 

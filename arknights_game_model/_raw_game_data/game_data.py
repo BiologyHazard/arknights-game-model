@@ -9,6 +9,7 @@ from .character_table import CharacterTable
 from .gamedata_const import GamedataConst
 from .item_table import ItemTable
 from .model import GameDataModel
+from .stage_table import StageTable
 from .uniequip_table import UniEquipTable
 
 
@@ -19,6 +20,7 @@ class Excel(GameDataModel):
     character_table: CharacterTable
     gamedata_const: GamedataConst
     item_table: ItemTable
+    stage_table: StageTable
     uniequip_table: UniEquipTable
 
 
@@ -34,6 +36,7 @@ data_structure = {
         "character_table": "json",
         "gamedata_const": "json",
         "item_table": "json",
+        "stage_table": "json",
         "uniequip_table": "json",
     },
 }
