@@ -130,3 +130,4 @@ class BuildingData(GameDataModel):
     manufact_formulas: dict[str, ManufactFormula]
     # shop_formulas: dict[str, Any]  # 空字典
     workshop_formulas: dict[str, WorkshopFormula]
+    trading_order_des_dict: dict[str, str]

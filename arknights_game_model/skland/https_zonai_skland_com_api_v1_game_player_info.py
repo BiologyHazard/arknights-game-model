@@ -386,10 +386,15 @@ class RogueMedal(GameDataModel):
 class RogueRecord(GameDataModel):
     rogue_id: str
     relic_cnt: int
+    """解锁道具"""
     bank: RogueBank
+    """投资系统"""
     clear_time: int
+    """TODO: 未知"""
     bp_level: int
+    """奖励等级"""
     medal: RogueMedal
+    """蚀刻章"""
 
 
 class Rogue(GameDataModel):
