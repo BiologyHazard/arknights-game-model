@@ -390,7 +390,7 @@ class RogueRecord(GameDataModel):
     bank: RogueBank
     """投资系统"""
     clear_time: int
-    """TODO: 未知"""
+    """猜测是通关次数"""
     bp_level: int
     """奖励等级"""
     medal: RogueMedal
