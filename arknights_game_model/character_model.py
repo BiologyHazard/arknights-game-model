@@ -71,7 +71,10 @@ class UniEquip:
     @property
     def character_id(self) -> str:
         """获取模组对应的干员 ID"""
-        return self._raw_data.char_id
+        if self._raw_data.tmpl_id is not None:
+            return self._raw_data.tmpl_id
+        else:
+            return self._raw_data.char_id
 
     @property
     def online_timestamp(self) -> int:
