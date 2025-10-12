@@ -16,6 +16,7 @@ type RoomType = str
 class StageDrop(GameDataModel):
     stage_id: str
     occ_per: OccPer
+    sort_id: int
 
 
 class BuildingProduct(GameDataModel):

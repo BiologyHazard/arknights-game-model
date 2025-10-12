@@ -152,7 +152,10 @@ class ItemType(StrEnum):
     EXCLUSIVE_TKT_GACHA_10 = 'EXCLUSIVE_TKT_GACHA_10'
     SO_CHAR_EXP = 'SO_CHAR_EXP'
     GIFTPACKAGE_TKT = 'GIFTPACKAGE_TKT'
+    VOUCHER_SKIN_V2 = 'VOUCHER_SKIN_V2'
+    RANDOM_VOUCHER_SKIN = 'RANDOM_VOUCHER_SKIN'
     ACT1VHALFIDLE_ITEM = 'ACT1VHALFIDLE_ITEM'
+    PLOT_ITEM = 'PLOT_ITEM'
 
 
 # class ItemBundle(GameDataModel):
@@ -237,6 +240,8 @@ class StageData_SpecialStoryInfo(GameDataModel):
     rewards: list[ItemBundle]
     progress_info: StageData_SpecialProgressInfo
     image_id: str
+    key_item_id: str | None
+    unlock_desc: str | None
 
 
 class StageData(GameDataModel):

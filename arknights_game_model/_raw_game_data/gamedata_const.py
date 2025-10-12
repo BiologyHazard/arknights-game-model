@@ -9,6 +9,11 @@ class TermDescription(GameDataModel):
     description: str
 
 
+class GameDataConsts_FeverGameData(GameDataModel):
+    fever_duration: float
+    fever_need: float
+
+
 class GamedataConst(GameDataModel):
     max_player_level: int
     player_exp_map: list[int]
@@ -34,6 +39,9 @@ class GamedataConst(GameDataModel):
     diamond_to_shd_rate: int
     request_same_friend_cd: int
     base_max_friend_num: int
+    max_star_friend_num: int
+    max_squad_assist_display_num: int
+    friend_star_edit_track_ts: int
     hard_diamond_drop: int
     inst_fin_dmd_shd_cost: int
     easy_crystal_bonus: int
@@ -106,6 +114,7 @@ class GamedataConst(GameDataModel):
     is_classic_gacha_pool_func_enabled: bool
     is_special_gacha_pool_func_enabled: bool
     is_voucher_classic_item_distinguishable: bool
+    is_recal_rune_func_enabled: bool
     voucher_skin_redeem: int
     voucher_skin_desc: str
     charm_equip_count: int
@@ -120,6 +129,7 @@ class GamedataConst(GameDataModel):
     default_max_multiple_battle_times: int
     multiple_action_open: bool
     sub_profession_damage_type_pairs: dict[str, int]
+    fever_game_data: GameDataConsts_FeverGameData
     classic_protect_char: list[str]
     birthday_setting_desc: str
     birthday_setting_confirm_desc: str
