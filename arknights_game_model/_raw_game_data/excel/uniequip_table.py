@@ -1,8 +1,6 @@
-from __future__ import annotations
+from pydantic_extra_types.color import Color
 
-from pydantic_extra_types.color import Color  # noqa: TC002
-
-from arknights_game_model.item_info_model import ItemBundle  # noqa: TC001
+from arknights_game_model.item_info_model import ItemBundle
 from arknights_game_model.model import GameDataModel
 
 

@@ -41,6 +41,7 @@ class Item:
         """合成自身的配方"""
         # 还可以通过 self._raw_data.building_product_list 获取，不清楚是否等价。
         from .game_data import game_data
+
         return {
             formula_id: formula
             for formula_id, formula in game_data.workshop_formulas.items()
@@ -50,10 +51,9 @@ class Item:
     def workshop_formulas_craft_other(self) -> dict[str, WorkshopFormula]:
         """合成其他物品的配方"""
         from .game_data import game_data
+
         return {
-            formula_id: formula
-            for formula_id, formula in game_data.workshop_formulas.items()
-            if self.item_id in formula.costs
+            formula_id: formula for formula_id, formula in game_data.workshop_formulas.items() if self.item_id in formula.costs
         }
 
     def __repr__(self):

@@ -40,10 +40,9 @@ class UniEquip:
     _raw_data: UniEquipData
     _online_timestamp: int
 
-    def __init__(self, raw_data: UniEquipData, online_timestamp: int | None = None):
+    def __init__(self, raw_data: UniEquipData, online_timestamp: int):
         self._raw_data = raw_data
-        if online_timestamp is not None:
-            self._online_timestamp = online_timestamp
+        self._online_timestamp = online_timestamp
 
     @property
     def uniequip_id(self) -> str:
@@ -116,14 +115,13 @@ class Character:
     _id: str
     _raw_data: CharacterData
     _is_patch_char: bool
-    _cn_online_time: Timestamp
+    _cn_online_time: Timestamp | None
 
     def __init__(self, id: str, raw_data: CharacterData, is_patch_char: bool, cn_online_time: Timestamp | None = None):
         self._id = id
         self._raw_data = raw_data
         self._is_patch_char = is_patch_char
-        if cn_online_time is not None:
-            self._cn_online_time = cn_online_time
+        self._cn_online_time = cn_online_time
 
     @property
     def id(self) -> str:
@@ -170,8 +168,8 @@ class Character:
         return len(self._raw_data.phases) - 1
 
     @property
-    def cn_online_time(self) -> Timestamp:
-        """干员上线时间，数据来自 PRTS Wiki，若不存在则抛出 `AttributeError`"""
+    def cn_online_time(self) -> Timestamp | None:
+        """干员上线时间，数据来自 PRTS Wiki，若不存在则为 None"""
         return self._cn_online_time
 
     def max_level(self, elite_level: int) -> int:

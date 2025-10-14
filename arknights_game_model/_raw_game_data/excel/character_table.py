@@ -1,10 +1,8 @@
-from __future__ import annotations
-
 from enum import Enum
 
-from pydantic import ConfigDict, Field
+from pydantic import Field
 
-from arknights_game_model.item_info_model import ItemBundle  # noqa: TC001
+from arknights_game_model.item_info_model import ItemBundle
 from arknights_game_model.model import GameDataModel
 
 
@@ -149,12 +147,10 @@ class AllSkillLvlup(GameDataModel):
 
 
 class CharacterData(GameDataModel):
-    model_config = ConfigDict(strict=False)
-
     name: str
     description: str | None
     sort_index: int
-    sp_target_type: SpecialOperatorTargetType
+    sp_target_type: SpecialOperatorTargetType = Field(strict=False)
     sp_target_id: str | None
     can_use_general_potential_item: bool
     can_use_activity_potential_item: bool
