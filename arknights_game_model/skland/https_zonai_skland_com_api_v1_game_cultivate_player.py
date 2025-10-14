@@ -1,6 +1,6 @@
 from pydantic import Field
 
-from arknights_game_model._raw_game_data.model import GameDataModel
+from arknights_game_model.model import GameDataModel
 
 
 class Skill(GameDataModel):

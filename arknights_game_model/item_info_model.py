@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 from collections import defaultdict
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Iterable, Mapping
 from typing import TYPE_CHECKING, NamedTuple, Self, SupportsIndex, TypedDict, overload
 
 type ItemInfoLike = ItemInfo | tuple[str, int | float] | str | ItemBundle
@@ -66,6 +66,7 @@ class ItemInfo(NamedTuple):
     @classmethod
     def from_name_and_count(cls, name: str, count: int | float = 1) -> Self:
         from .game_data import game_data
+
         item_id = game_data.items.by_name(name).item_id
         return cls(item_id, count)
 
@@ -84,6 +85,7 @@ class ItemInfo(NamedTuple):
     @property
     def item(self) -> Item:
         from .game_data import game_data
+
         return game_data.items.by_id(self.item_id)
 
     def yituliu_item_value(self, *, strict: bool) -> float:
@@ -117,8 +119,6 @@ class ItemInfoList(list[ItemInfo]):
 
     @classmethod
     def from_str(cls, s: str) -> Self:
-        if s == f"{cls.__name__}()":
-            return cls()
         return cls(ItemInfo.from_str(item_str) for item_str in s.split())
 
     @classmethod
@@ -149,8 +149,11 @@ class ItemInfoList(list[ItemInfo]):
                 workshop_formulas_craft_self = item.workshop_formulas_craft_self()
                 assert len(workshop_formulas_craft_self) == 1
                 formula = next(iter(workshop_formulas_craft_self.values()))
-                item_info_list.extend(ItemInfo(item_info.item_id, item_info.count * count)
-                                      for item_info in formula.costs if item_info.item_id != "4001")
+                item_info_list.extend(
+                    ItemInfo(item_info.item_id, item_info.count * count)
+                    for item_info in formula.costs
+                    if item_info.item_id != "4001"
+                )
             else:
                 item_info_list.append(item_info)
         return item_info_list
@@ -195,14 +198,13 @@ class ItemInfoList(list[ItemInfo]):
 
     def to_clipboard(self) -> None:
         import pyperclip
+
         pyperclip.copy(self.to_csv())
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({super().__repr__()})"
 
     def __str__(self) -> str:
-        if not self:
-            return f"{self.__class__.__name__}()"
         return " ".join(map(str, self))
 
     def copy(self) -> Self:

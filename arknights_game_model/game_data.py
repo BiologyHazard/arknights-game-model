@@ -1,17 +1,20 @@
 from __future__ import annotations
 
-from collections.abc import Callable
-from pathlib import Path
-from typing import Self
+from typing import TYPE_CHECKING
 
+from ._raw_game_data.excel.item_table import Item as ItemInGame
 from ._raw_game_data.game_data import ArknightsGameData, load_data
-from ._raw_game_data.item_table import Item as ItemInGame
 from .building_model import WorkshopFormula
 from .character_model import Character, UniEquip, UniEquipDict
 from .item_info_model import ItemInfoList
 from .item_model import Item
 from .log import logger
 from .utils import 计算累计消耗
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from pathlib import Path
+    from typing import Self
 
 
 class CharacterDict(dict[str, Character]):

@@ -2,15 +2,16 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .building_data import BuildingData
-from .campaign_table import CampaignTable
-from .char_patch_table import CharPatchTable
-from .character_table import CharacterTable
-from .gamedata_const import GamedataConst
-from .item_table import ItemTable
-from .model import GameDataModel
-from .stage_table import StageTable
-from .uniequip_table import UniEquipTable
+from arknights_game_model.model import GameDataModel
+
+from .excel.building_data import BuildingData
+from .excel.campaign_table import CampaignTable
+from .excel.char_patch_table import CharPatchTable
+from .excel.character_table import CharacterTable
+from .excel.gamedata_const import GamedataConst
+from .excel.item_table import ItemTable
+from .excel.stage_table import StageTable
+from .excel.uniequip_table import UniEquipTable
 
 
 class Excel(GameDataModel):

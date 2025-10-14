@@ -4,9 +4,8 @@ from enum import Enum
 
 from pydantic import ConfigDict, Field
 
-from arknights_game_model.item_info_model import ItemBundle
-
-from .model import GameDataModel
+from arknights_game_model.item_info_model import ItemBundle  # noqa: TC001
+from arknights_game_model.model import GameDataModel
 
 
 class SpecialOperatorTargetType(Enum):

@@ -1,19 +1,21 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from arknights_game_model.game_data import GameData
 
 
 def patch_to(game_data: GameData, path: Path) -> None:
     from arknights_game_model.log import logger
+
     if not path.is_file():
         raise FileNotFoundError(f"Item value file not found: {path}")
 
-    with open(path, 'r', encoding='utf-8') as f:
+    with open(path, "r", encoding="utf-8") as f:
         obj = json.load(f)
 
     if "data" in obj:  # 来自后端

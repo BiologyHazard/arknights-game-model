@@ -1,4 +1,4 @@
-from ._raw_game_data.building_data import WorkshopFormula as WorkshopFormulaInGame
+from ._raw_game_data.excel.building_data import WorkshopFormula as WorkshopFormulaInGame
 from .item_info_model import ItemInfo, ItemInfoList
 
 

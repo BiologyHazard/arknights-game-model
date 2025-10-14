@@ -1,8 +1,7 @@
 from typing import Any
 
 from arknights_game_model.item_info_model import ItemBundle
-
-from .model import GameDataModel
+from arknights_game_model.model import GameDataModel
 
 
 class BreakLadder(GameDataModel):

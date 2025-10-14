@@ -1,7 +1,8 @@
 from typing import Any
 
+from arknights_game_model.model import GameDataModel
+
 from .character_table import CharacterData
-from .model import GameDataModel
 
 
 class CharPatchTable(GameDataModel):

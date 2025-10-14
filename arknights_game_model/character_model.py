@@ -4,7 +4,7 @@ from enum import Enum
 from functools import lru_cache
 from typing import TYPE_CHECKING, NamedTuple
 
-from ._raw_game_data.character_table import CharacterData, SpecialOperatorTargetType
+from ._raw_game_data.excel.character_table import CharacterData, SpecialOperatorTargetType
 from .item_info_model import ItemInfoList
 
 if TYPE_CHECKING:
@@ -12,8 +12,8 @@ if TYPE_CHECKING:
 
     from pandas import Timestamp
 
-    from ._raw_game_data.character_table import CharacterData
-    from ._raw_game_data.uniequip_table import UniEquipData
+    from ._raw_game_data.excel.character_table import CharacterData
+    from ._raw_game_data.excel.uniequip_table import UniEquipData
 
 
 class Profession(NamedTuple):
@@ -84,6 +84,7 @@ class UniEquip:
     def character(self) -> Character:
         """获取模组对应的干员"""
         from .game_data import game_data
+
         return game_data.characters.by_id(self._raw_data.char_id)
 
     def 升级一次消耗(self, 目标等级: int) -> ItemInfoList:
@@ -179,10 +180,12 @@ class Character:
     @lru_cache
     def uniequip_ids(self) -> list[str]:
         from .game_data import game_data
+
         return game_data.raw_data.excel.uniequip_table.char_equip.get(self._id, [])
 
     def uniequips(self) -> UniEquipDict:
         from .game_data import game_data
+
         return UniEquipDict((uniequip_id, game_data.uniequips[uniequip_id]) for uniequip_id in self.uniequip_ids())
 
     def get_uniequip_by_type(self, type_name: str) -> UniEquip:
@@ -213,6 +216,7 @@ class Character:
             return ItemInfoList()
 
         from .game_data import game_data
+
         龙门币 = game_data.raw_data.excel.gamedata_const.evolve_gold_cost[self._raw_data.rarity][目标精英化阶段 - 1]
         item_info_list = ItemInfoList.from_name_and_count([("龙门币", 龙门币)])
         item_info_list.extend(self._raw_data.phases[目标精英化阶段].evolve_cost)
@@ -255,11 +259,18 @@ class Character:
             return ItemInfoList()
 
         from .game_data import game_data
+
         EXP = game_data.累计消耗EXP[精英化阶段][目标等级 - 1] - game_data.累计消耗EXP[精英化阶段][初始等级 - 1]
         龙门币 = game_data.累计消耗龙门币[精英化阶段][目标等级 - 1] - game_data.累计消耗龙门币[精英化阶段][初始等级 - 1]
         return ItemInfoList.from_name_and_count([("EXP", EXP), ("龙门币", 龙门币)])
 
-    def 等级升级消耗(self, 初始精英化阶段: int | None = None, 初始等级: int | None = None, 目标精英化阶段: int | None = None, 目标等级: int | None = None) -> ItemInfoList:
+    def 等级升级消耗(
+        self,
+        初始精英化阶段: int | None = None,
+        初始等级: int | None = None,
+        目标精英化阶段: int | None = None,
+        目标等级: int | None = None,
+    ) -> ItemInfoList:
         """
         计算从初始等级升级到目标等级的消耗，仅含升级所需的 EXP 和龙门币，不含精英化的消耗
         升变干员和特勤干员不计算等级升级消耗
@@ -276,7 +287,13 @@ class Character:
             item_info_list.extend(self.等级升级一次消耗(当前精英化阶段, 当前精英化阶段初始等级, 当前精英化阶段目标等级))
         return item_info_list
 
-    def 精英化等级升级消耗(self, 初始精英化阶段: int | None = None, 初始等级: int | None = None, 目标精英化阶段: int | None = None, 目标等级: int | None = None) -> ItemInfoList:
+    def 精英化等级升级消耗(
+        self,
+        初始精英化阶段: int | None = None,
+        初始等级: int | None = None,
+        目标精英化阶段: int | None = None,
+        目标等级: int | None = None,
+    ) -> ItemInfoList:
         """
         计算从初始等级升级到目标等级的消耗，含升级所需的 EXP 和龙门币，以及精英化所需的龙门币、精英材料
         升变干员和特勤干员不计算精英化、等级升级消耗
@@ -327,7 +344,9 @@ class Character:
 
         return ItemInfoList.new(self._raw_data.skills[技能序号 - 1].level_up_cost_cond[目标技能专精等级 - 1].level_up_cost)
 
-    def 技能专精消耗(self, 技能序号: int, 初始技能专精等级: int | None = None, 目标技能专精等级: int | None = None) -> ItemInfoList:
+    def 技能专精消耗(
+        self, 技能序号: int, 初始技能专精等级: int | None = None, 目标技能专精等级: int | None = None
+    ) -> ItemInfoList:
         """
         技能序号范围 `[1, 3]`
         专精等级范围 `[0, 3]`
@@ -380,7 +399,9 @@ class Character:
         item_info_list = ItemInfoList()
         item_info_list.extend(self.精英化等级升级消耗(初始精英化阶段, 初始等级, 目标精英化阶段, 目标等级))
         item_info_list.extend(self.通用技能升级消耗(初始技能等级, 目标技能等级))
-        for 技能序号, (初始技能专精等级, 目标技能专精等级) in enumerate(zip(初始技能专精等级列表, 目标技能专精等级列表), start=1):
+        for 技能序号, (初始技能专精等级, 目标技能专精等级) in enumerate(
+            zip(初始技能专精等级列表, 目标技能专精等级列表), start=1
+        ):
             item_info_list.extend(self.技能专精消耗(技能序号, 初始技能专精等级, 目标技能专精等级))
         for uniequip_id, uniequip in self.uniequips().items():
             if uniequip.is_original:
@@ -388,8 +409,12 @@ class Character:
             在初始模组等级字典中 = uniequip_id in 初始模组等级字典 or uniequip.type_name2 in 初始模组等级字典
             在目标模组等级字典中 = uniequip_id in 目标模组等级字典 or uniequip.type_name2 in 目标模组等级字典
             if 在初始模组等级字典中 and 在目标模组等级字典中:
-                初始模组等级 = 初始模组等级字典[uniequip_id] if uniequip_id in 初始模组等级字典 else 初始模组等级字典[uniequip.type_name2]  # type: ignore
-                目标模组等级 = 目标模组等级字典[uniequip_id] if uniequip_id in 目标模组等级字典 else 目标模组等级字典[uniequip.type_name2]  # type: ignore
+                初始模组等级 = (
+                    初始模组等级字典[uniequip_id] if uniequip_id in 初始模组等级字典 else 初始模组等级字典[uniequip.type_name2]  # type: ignore
+                )
+                目标模组等级 = (
+                    目标模组等级字典[uniequip_id] if uniequip_id in 目标模组等级字典 else 目标模组等级字典[uniequip.type_name2]  # type: ignore
+                )
                 item_info_list.extend(self.模组升级消耗(uniequip_id, 初始模组等级, 目标模组等级))
             elif 在初始模组等级字典中 or 在目标模组等级字典中:
                 raise ValueError(f"模组 {uniequip!r} 的初始等级和目标等级需同时指定")

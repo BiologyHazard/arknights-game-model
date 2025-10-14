@@ -17,9 +17,11 @@ parser.add_argument("--online-time-path", type=Path, required=True, help="干员
 parser.add_argument("--yituliu-item-value-path", type=Path, required=True, help="一图流物品价值表路径")
 args = parser.parse_args()
 
-game_data.load_data(gamedata_folder=args.gamedata_folder,
-                    online_time_path=args.online_time_path,
-                    yituliu_item_value_path=args.yituliu_item_value_path)
+game_data.load_data(
+    gamedata_folder=args.gamedata_folder,
+    online_time_path=args.online_time_path,
+    yituliu_item_value_path=args.yituliu_item_value_path,
+)
 
 gd: GameData = game_data
 P = Professions

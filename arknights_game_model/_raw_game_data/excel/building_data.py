@@ -1,42 +1,41 @@
 from enum import StrEnum
 from typing import Any, Literal
 
+from arknights_game_model.model import GameDataModel
 from pydantic import ConfigDict, Field
 
 from arknights_game_model.item_info_model import ItemBundle
 
-from .model import GameDataModel
-
 
 class RoomType(StrEnum):
-    NONE = 'NONE'
-    CONTROL = 'CONTROL'
-    POWER = 'POWER'
-    MANUFACTURE = 'MANUFACTURE'
-    SHOP = 'SHOP'
-    DORMITORY = 'DORMITORY'
-    MEETING = 'MEETING'
-    HIRE = 'HIRE'
-    ELEVATOR = 'ELEVATOR'
-    CORRIDOR = 'CORRIDOR'
-    TRADING = 'TRADING'
-    WORKSHOP = 'WORKSHOP'
-    TRAINING = 'TRAINING'
-    PRIVATE = 'PRIVATE'
-    FUNCTIONAL = 'FUNCTIONAL'
-    ALL = 'ALL'
+    NONE = "NONE"
+    CONTROL = "CONTROL"
+    POWER = "POWER"
+    MANUFACTURE = "MANUFACTURE"
+    SHOP = "SHOP"
+    DORMITORY = "DORMITORY"
+    MEETING = "MEETING"
+    HIRE = "HIRE"
+    ELEVATOR = "ELEVATOR"
+    CORRIDOR = "CORRIDOR"
+    TRADING = "TRADING"
+    WORKSHOP = "WORKSHOP"
+    TRAINING = "TRAINING"
+    PRIVATE = "PRIVATE"
+    FUNCTIONAL = "FUNCTIONAL"
+    ALL = "ALL"
 
 
 class FormulaItemType(StrEnum):
-    NONE = 'NONE'
-    F_EVOLVE = 'F_EVOLVE'
-    F_BUILDING = 'F_BUILDING'
-    F_GOLD = 'F_GOLD'
-    F_DIAMOND = 'F_DIAMOND'
-    F_FURNITURE = 'F_FURNITURE'
-    F_EXP = 'F_EXP'
-    F_ASC = 'F_ASC'
-    F_SKILL = 'F_SKILL'
+    NONE = "NONE"
+    F_EVOLVE = "F_EVOLVE"
+    F_BUILDING = "F_BUILDING"
+    F_GOLD = "F_GOLD"
+    F_DIAMOND = "F_DIAMOND"
+    F_FURNITURE = "F_FURNITURE"
+    F_EXP = "F_EXP"
+    F_ASC = "F_ASC"
+    F_SKILL = "F_SKILL"
 
 
 class Cond(GameDataModel):

@@ -1,6 +1,6 @@
 from typing import Any
 
-from arknights_game_model._raw_game_data.model import GameDataModel
+from arknights_game_model.model import GameDataModel
 
 
 class ShowConfig(GameDataModel):
@@ -268,6 +268,7 @@ class Training(BaseRoom):
 
 class Labor(GameDataModel):
     """无人机"""
+
     max_value: int
     value: int
     last_update_time: int
@@ -280,6 +281,7 @@ class Furniture(GameDataModel):
 
 class Elevator(BaseRoom):
     """电梯"""
+
     # slot_id: str
     slot_state: int
     # level: int
@@ -287,6 +289,7 @@ class Elevator(BaseRoom):
 
 class Corridor(BaseRoom):
     """走廊"""
+
     # slot_id: str
     slot_state: int
     # level: int
@@ -321,6 +324,7 @@ class Building(GameDataModel):
 
 class RecruitItem(GameDataModel):
     """公开招募格子信息"""
+
     start_ts: int
     """公开招募开始的时间戳，-1 表示未开始"""
     finish_ts: int
@@ -331,6 +335,7 @@ class RecruitItem(GameDataModel):
 
 class CampaignRecord(GameDataModel):
     """剿灭作战单个作战记录"""
+
     campaign_id: str
     """剿灭作战 ID"""
     max_kills: int
@@ -339,6 +344,7 @@ class CampaignRecord(GameDataModel):
 
 class CampaignReward(GameDataModel):
     """剿灭作战每周奖励"""
+
     current: int
     """本周已获取的合成玉报酬"""
     total: int
@@ -347,6 +353,7 @@ class CampaignReward(GameDataModel):
 
 class Campaign(GameDataModel):
     """剿灭作战信息"""
+
     records: list[CampaignRecord]
     reward: CampaignReward
 
@@ -369,6 +376,7 @@ class TowerReward(GameDataModel):
 
 class Tower(GameDataModel):
     """保全派驻信息"""
+
     records: list[TowerRecord]
     reward: TowerReward
 
@@ -399,6 +407,7 @@ class RogueRecord(GameDataModel):
 
 class Rogue(GameDataModel):
     """集成战略"""
+
     records: list[RogueRecord]
 
 
@@ -409,6 +418,7 @@ class RoutineProgress(GameDataModel):
 
 class Routine(GameDataModel):
     """任务"""
+
     daily: RoutineProgress
     weekly: RoutineProgress
 
@@ -422,6 +432,7 @@ class ActivityZone(GameDataModel):
 
 class Activity(GameDataModel):
     """活动"""
+
     act_id: str
     act_replica_id: str
     zones: list[ActivityZone]
@@ -429,6 +440,7 @@ class Activity(GameDataModel):
 
 class CharInfo(GameDataModel):
     """干员信息"""
+
     id: str
     name: str
     nation_id: str
@@ -444,6 +456,7 @@ class CharInfo(GameDataModel):
 
 class SkinInfo(GameDataModel):
     """皮肤信息"""
+
     id: str
     name: str
     brand_id: str
@@ -466,6 +479,7 @@ class StageInfo(GameDataModel):
 
 class ActivityInfo(GameDataModel):
     """活动信息"""
+
     id: str
     name: str
     start_time: int
@@ -481,6 +495,7 @@ class ActivityInfo(GameDataModel):
 
 class TowerInfo(GameDataModel):
     """保全派驻信息模型"""
+
     id: str
     name: str
     sub_name: str
@@ -489,6 +504,7 @@ class TowerInfo(GameDataModel):
 
 class RogueInfo(GameDataModel):
     """集成战略信息"""
+
     id: str
     name: str
     sort: int
@@ -497,6 +513,7 @@ class RogueInfo(GameDataModel):
 
 class CampaignInfo(GameDataModel):
     """剿灭作战信息"""
+
     id: str
     name: str
     campaign_zone_id: str
@@ -505,12 +522,14 @@ class CampaignInfo(GameDataModel):
 
 class CampaignZoneInfo(GameDataModel):
     """剿灭作战区域信息"""
+
     id: str
     name: str
 
 
 class EquipmentInfo(GameDataModel):
     """模组信息模型"""
+
     id: str
     name: str
     type_icon: str
@@ -520,6 +539,7 @@ class EquipmentInfo(GameDataModel):
 
 class ManufactureFormulaInfo(GameDataModel):
     """制造配方信息模型"""
+
     id: str
     item_id: str
     count: int
@@ -548,6 +568,7 @@ class BossRushRecord(GameDataModel):
 
 class BossRush(GameDataModel):
     """引航者试炼"""
+
     id: str
     record: BossRushRecord
     pic_url: str
@@ -555,6 +576,7 @@ class BossRush(GameDataModel):
 
 class Banner(GameDataModel):
     """森空岛 Banner"""
+
     id: str
     sort_id: int
     img_url: str
@@ -572,6 +594,7 @@ class SandboxSubQuest(GameDataModel):
 
 class Sandbox(GameDataModel):
     """生息演算"""
+
     id: str
     name: str
     max_day: int
