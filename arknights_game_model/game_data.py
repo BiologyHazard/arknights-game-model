@@ -107,7 +107,7 @@ class GameData:
             for id, character in self.raw_data.excel.char_patch_table.patch_chars.items()
         )
         # 干员上线时间
-        from prts_wiki.char_cn_online_time_patch import patch_to
+        from .prts_wiki.char_cn_online_time_patch import patch_to
 
         patch_to(self, online_time_path)
 
@@ -138,7 +138,7 @@ class GameData:
         self.items[exp_item_in_game.item_id] = EXP_item
 
         # 一图流物品价值
-        from yituliu.item_value import patch_to
+        from .yituliu.item_value import patch_to
 
         patch_to(self, yituliu_item_value_path)
 

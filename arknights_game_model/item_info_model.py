@@ -89,10 +89,10 @@ class ItemInfo(NamedTuple):
         return game_data.items.by_id(self.item_id)
 
     def yituliu_item_value(self, *, strict: bool) -> float:
-        if strict and not hasattr(self.item, "yituliu_item_value"):
+        if strict and self.item.yituliu_item_value is None:
             raise ValueError(f"物品 {self.item_id} 没有一图流价值")
         else:
-            return getattr(self.item, "yituliu_item_value", 0)
+            return self.item.yituliu_item_value or 0
 
     def __str__(self) -> str:
         try:

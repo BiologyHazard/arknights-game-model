@@ -4,12 +4,11 @@ from .building_model import WorkshopFormula
 
 class Item:
     _raw_data: ItemInGame
-    _yituliu_item_value: float
+    _yituliu_item_value: float | None
 
     def __init__(self, raw_data: ItemInGame, yituliu_item_value: float | None = None) -> None:
         self._raw_data = raw_data
-        if yituliu_item_value is not None:
-            self._yituliu_item_value = yituliu_item_value
+        self._yituliu_item_value = yituliu_item_value
 
     @property
     def item_id(self) -> str:
@@ -33,8 +32,8 @@ class Item:
         return 100000 <= self.sort_id < 200000
 
     @property
-    def yituliu_item_value(self) -> float:
-        """一图流物品价值，数据来自明日方舟一图流，若不存在则抛出 `AttributeError`"""
+    def yituliu_item_value(self) -> float | None:
+        """一图流物品价值，数据来自明日方舟一图流"""
         return self._yituliu_item_value
 
     def workshop_formulas_craft_self(self) -> dict[str, WorkshopFormula]:
