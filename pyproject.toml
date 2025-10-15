@@ -1,0 +1,15 @@
+[project]
+name = "arknights-game-model"
+version = "0.1.0"
+description = "Arknights game model"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "loguru>=0.7.3",
+    "lxml>=6.0.2",
+    "pandas>=2.3.3",
+    "pydantic>=2.12.0",
+    "pydantic-extra-types>=2.10.6",
+    "pydantic-settings>=2.11.0",
+    "pyperclip>=1.11.0",
+]
