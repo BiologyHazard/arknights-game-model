@@ -38,13 +38,3 @@ class Config(BaseSettings):
             return v.upper()
         else:
             return v
-
-
-_config = None
-
-
-def get_config() -> Config:
-    global _config
-    if _config is None:
-        _config = Config()  # type: ignore
-    return _config

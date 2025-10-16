@@ -6,7 +6,7 @@ from ._raw_game_data import ArknightsGameData, load_data
 from ._raw_game_data.excel.item_table import Item as ItemInGame
 from .building_model import WorkshopFormula
 from .character_model import Character, UniEquip, UniEquipDict
-from .config import get_config
+from .config import Config
 from .item_info_model import ItemInfoList
 from .item_model import Item
 from .log import logger
@@ -67,9 +67,9 @@ class GameData:
     uniequips: dict[str, UniEquip]
     workshop_formulas: dict[str, WorkshopFormula]
 
-    def load_data(self) -> None:
+    def load_data(self, **kwargs) -> None:
         logger.info("Loading game data...")
-        config = get_config()
+        config = Config(**kwargs)
         logger.configure(extra={"arknights_game_model_log_level": config.log_level})
         logger.info(f"Loaded config: {config!r}")
 

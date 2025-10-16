@@ -1,6 +1,6 @@
 [project]
 name = "arknights-game-model"
-version = "0.1.0"
+version = "0.1.1"
 description = "Arknights game model"
 readme = "README.md"
 requires-python = ">=3.12"
