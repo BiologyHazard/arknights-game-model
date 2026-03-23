@@ -253,14 +253,14 @@ class StageData(GameDataModel):
     stage_id: str
     level_id: str | None
     zone_id: str
-    code: str
+    code: str | None
     name: str | None
     description: str | None
     hard_staged_id: str | None
     six_star_stage_id: str | None
     danger_level: str | None
     danger_point: float
-    loading_pic_id: str
+    loading_pic_id: str | None
     can_practice: bool
     can_battle_replay: bool
     ap_cost: int

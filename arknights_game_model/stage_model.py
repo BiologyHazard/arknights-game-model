@@ -1,5 +1,7 @@
 from ._raw_game_data.excel.stage_table import StageData as StageDataInGame
-from ._raw_game_data.excel.stage_table import StageData_StageDropInfo as StageDropInfoInGame
+from ._raw_game_data.excel.stage_table import (
+    StageData_StageDropInfo as StageDropInfoInGame,
+)
 
 
 class Item:
@@ -13,7 +15,7 @@ class Item:
         return game_data.raw_data.excel.stage_table.stages[self._stage_id]
 
     @property
-    def code(self) -> str:
+    def code(self) -> str | None:
         return self.raw_data.code
 
     @property
