@@ -73,7 +73,11 @@ class GameData:
         logger.configure(extra={"arknights_game_model_log_level": config.log_level})
         logger.info(f"Loaded config: {config!r}")
 
-        self.raw_data = load_data(config.gamedata_folder)
+        self.raw_data = load_data(
+            config.gamedata_folder,
+            strict=config.pydantic_model_validate_strict,
+            extra=config.pydantic_model_validate_extra,
+        )
         self.load_characters(config.online_time_path)
         self.load_items(config.yituliu_item_value_path)
         self.load_uniequips()
@@ -112,7 +116,10 @@ class GameData:
         patch_to(self, online_time_path)
 
     def load_items(self, yituliu_item_value_path: Path):
-        self.items = ItemDict((id, Item(raw_data=item)) for id, item in self.raw_data.excel.item_table.items.items())
+        self.items = ItemDict(
+            (id, Item(raw_data=item))
+            for id, item in self.raw_data.excel.item_table.items.items()
+        )
 
         # 添加 EXP 物品
         exp_item_in_game = ItemInGame(
@@ -150,18 +157,28 @@ class GameData:
                 equip_online_timestamp[track_item.equip_id] = equip_track.time_stamp
 
         self.uniequips = UniEquipDict(
-            (uniequip_id, UniEquip(uniequip, online_timestamp=equip_online_timestamp[uniequip_id]))
+            (
+                uniequip_id,
+                UniEquip(
+                    uniequip, online_timestamp=equip_online_timestamp[uniequip_id]
+                ),
+            )
             for uniequip_id, uniequip in self.raw_data.excel.uniequip_table.equip_dict.items()
         )
 
     def load_workshop_formulas(self):
         self.workshop_formulas = dict(
-            (id, WorkshopFormula(formula)) for id, formula in self.raw_data.excel.building_data.workshop_formulas.items()
+            (id, WorkshopFormula(formula))
+            for id, formula in self.raw_data.excel.building_data.workshop_formulas.items()
         )
 
     def calc_game_consts(self):
-        self.累计消耗EXP = 计算累计消耗(self.raw_data.excel.gamedata_const.character_exp_map)
-        self.累计消耗龙门币 = 计算累计消耗(self.raw_data.excel.gamedata_const.character_upgrade_cost_map)
+        self.累计消耗EXP = 计算累计消耗(
+            self.raw_data.excel.gamedata_const.character_exp_map
+        )
+        self.累计消耗龙门币 = 计算累计消耗(
+            self.raw_data.excel.gamedata_const.character_upgrade_cost_map
+        )
 
 
 game_data = GameData()
