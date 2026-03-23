@@ -100,7 +100,7 @@ class UniEquip:
         if 初始等级 is None:
             初始等级 = 0
         if 目标等级 is None:
-            目标等级 = 0 if self.is_original else 3
+            目标等级 = len(self._raw_data.item_cost)
 
         item_info_list = ItemInfoList()
         for 当前等级 in range(初始等级, 目标等级):
