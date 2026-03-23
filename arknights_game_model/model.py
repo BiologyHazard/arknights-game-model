@@ -17,6 +17,9 @@ class GameDataModel(BaseModel):
     @classmethod
     def to_lower(cls, data):
         if isinstance(data, dict):
-            return {(k.lower().replace("_", "") if isinstance(k, str) else k): v for k, v in data.items()}
+            return {
+                (k.lower().replace("_", "") if isinstance(k, str) else k): v
+                for k, v in data.items()
+            }
         else:
             return data

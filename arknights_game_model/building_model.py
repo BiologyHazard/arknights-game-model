@@ -46,9 +46,14 @@ class WorkshopFormula:
     @property
     def extra_outcomes(self) -> ItemInfoList:
         extra_outcome_rate = self._raw_data.extra_outcome_rate
-        total_weight = sum(outcome.weight for outcome in self._raw_data.extra_outcome_group)
+        total_weight = sum(
+            outcome.weight for outcome in self._raw_data.extra_outcome_group
+        )
         item_info_list = ItemInfoList.new(
-            (outcome.item_id, outcome.item_count * outcome.weight / total_weight * extra_outcome_rate)
+            (
+                outcome.item_id,
+                outcome.item_count * outcome.weight / total_weight * extra_outcome_rate,
+            )
             for outcome in self._raw_data.extra_outcome_group
         )
         return item_info_list

@@ -24,4 +24,7 @@ def find_at_tags(s: str) -> list[str]:
 
 
 def 计算累计消耗(干员升级消耗: Iterable[Iterable[int]]) -> list[list[int]]:
-    return [list(accumulate(filter(lambda x: x > 0, 升级消耗列表), initial=0)) for 升级消耗列表 in 干员升级消耗]
+    return [
+        list(accumulate(filter(lambda x: x > 0, 升级消耗列表), initial=0))
+        for 升级消耗列表 in 干员升级消耗
+    ]

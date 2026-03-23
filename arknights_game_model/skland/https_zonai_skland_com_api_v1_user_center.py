@@ -1,7 +1,5 @@
 from typing import Any
 
-from pydantic import ConfigDict
-
 from arknights_game_model.model import GameDataModel
 
 

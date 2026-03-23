@@ -6,12 +6,12 @@ def interactive():
 
 
 if __name__ == "__main__":
-    from datetime import UTC, date, datetime, time, timedelta, timezone
-    from pathlib import Path
+    from datetime import UTC, date, datetime, time, timedelta, timezone  # noqa: F401
+    from pathlib import Path  # noqa: F401
 
-    import pandas as pd
+    import pandas as pd  # noqa: F401
 
-    from arknights_game_model._raw_game_data import ArknightsGameData
+    from arknights_game_model._raw_game_data import ArknightsGameData  # noqa: F401
     from arknights_game_model.building_model import WorkshopFormula
     from arknights_game_model.character_model import (
         Professions,

@@ -6,7 +6,9 @@ class Item:
     _raw_data: ItemInGame
     _yituliu_item_value: float | None
 
-    def __init__(self, raw_data: ItemInGame, yituliu_item_value: float | None = None) -> None:
+    def __init__(
+        self, raw_data: ItemInGame, yituliu_item_value: float | None = None
+    ) -> None:
         self._raw_data = raw_data
         self._yituliu_item_value = yituliu_item_value
 
@@ -52,7 +54,9 @@ class Item:
         from .game_data import game_data
 
         return {
-            formula_id: formula for formula_id, formula in game_data.workshop_formulas.items() if self.item_id in formula.costs
+            formula_id: formula
+            for formula_id, formula in game_data.workshop_formulas.items()
+            if self.item_id in formula.costs
         }
 
     def __repr__(self):

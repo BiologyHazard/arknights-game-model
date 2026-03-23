@@ -23,7 +23,9 @@ mod_online_time_url = "https://prts.wiki/api.php?action=parse&page=%E5%B9%B2%E5%
 """https://prts.wiki/api.php?action=parse&page=干员模组一览/上线时间&format=json"""
 
 
-def fetch_data_from_prts_wiki(save_to: FilePath | WriteBuffer[bytes] | WriteBuffer[str] | None) -> pd.DataFrame:
+def fetch_data_from_prts_wiki(
+    save_to: FilePath | WriteBuffer[bytes] | WriteBuffer[str] | None,
+) -> pd.DataFrame:
     import io
     import json
     import urllib.request
@@ -49,14 +51,20 @@ def patch_to(game_data: GameData, path: Path) -> None:
     from arknights_game_model.log import logger
 
     if not path.is_file():
-        raise FileNotFoundError(f"{path} 不存在，请先调用 fetch_data_from_prts_wiki() 下载数据")
+        raise FileNotFoundError(
+            f"{path} 不存在，请先调用 fetch_data_from_prts_wiki() 下载数据"
+        )
 
     df = pd.read_csv(path)
-    df["国服上线时间"] = pd.to_datetime(df["国服上线时间"], format="%Y年%m月%d日 %H:%M").dt.tz_localize("Asia/Shanghai")
+    df["国服上线时间"] = pd.to_datetime(
+        df["国服上线时间"], format="%Y年%m月%d日 %H:%M"
+    ).dt.tz_localize("Asia/Shanghai")
 
-    character_name_to_id = {character.name: character.id for character in game_data.characters.values()} | special_character_ids
+    character_name_to_id = {
+        character.name: character.id for character in game_data.characters.values()
+    } | special_character_ids
 
-    for index, row in df.iterrows():
+    for _index, row in df.iterrows():
         name = row["干员"]
         if name not in character_name_to_id:
             continue
@@ -66,13 +74,21 @@ def patch_to(game_data: GameData, path: Path) -> None:
         character._cn_online_time = online_time
 
     not_in_wiki_names = [
-        character.name for character in game_data.characters.values() if character.name not in df["干员"].values
+        character.name
+        for character in game_data.characters.values()
+        if character.name not in df["干员"].values
     ]
-    not_in_gamedata_names = [name for name in df["干员"] if name not in character_name_to_id]
+    not_in_gamedata_names = [
+        name for name in df["干员"] if name not in character_name_to_id
+    ]
     if not_in_wiki_names:
-        logger.warning(f"以下干员在 character_table 中，但不在 PRTS Wiki 干员上线时间一览中：\n{', '.join(not_in_wiki_names)}")
+        logger.warning(
+            f"以下干员在 character_table 中，但不在 PRTS Wiki 干员上线时间一览中：\n{', '.join(not_in_wiki_names)}"
+        )
     if not_in_gamedata_names:
-        logger.warning(f"以下干员在 PRTS Wiki 上线时间表中，但不在 character_table 中：\n{', '.join(not_in_gamedata_names)}")
+        logger.warning(
+            f"以下干员在 PRTS Wiki 上线时间表中，但不在 character_table 中：\n{', '.join(not_in_gamedata_names)}"
+        )
 
 
 if __name__ == "__main__":

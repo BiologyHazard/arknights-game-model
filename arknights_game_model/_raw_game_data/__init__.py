@@ -39,9 +39,13 @@ def _load_recursive(path: Path, structure: dict[str, Any]) -> dict[str, Any]:
     return data
 
 
-def load_data(path: Path, *, strict: bool | None = None, extra: ExtraValues | None = None) -> ArknightsGameData:
+def load_data(
+    path: Path, *, strict: bool | None = None, extra: ExtraValues | None = None
+) -> ArknightsGameData:
     if strict:
         strict = None
     if extra == "forbid":
         extra = None
-    return ArknightsGameData.model_validate(_load_recursive(path, data_structure), strict=strict, extra=extra)
+    return ArknightsGameData.model_validate(
+        _load_recursive(path, data_structure), strict=strict, extra=extra
+    )

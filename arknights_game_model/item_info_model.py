@@ -64,7 +64,7 @@ class ItemInfo(NamedTuple):
         return cls(item_id=item_info_dict["id"], count=item_info_dict["count"])
 
     @classmethod
-    def from_name_and_count(cls, name: str, count: int | float = 1) -> Self:
+    def from_name_and_count(cls, name: str, count: int | float = 1) -> Self:  # noqa: PYI041
         from .game_data import game_data
 
         item_id = game_data.items.by_name(name).item_id
@@ -133,7 +133,9 @@ class ItemInfoList(list[ItemInfo]):
 
     def combine(self) -> Self:
         counter = self.counter()
-        return self.__class__(ItemInfo(item_id, count) for item_id, count in counter.items())
+        return self.__class__(
+            ItemInfo(item_id, count) for item_id, count in counter.items()
+        )
 
     def combine_in_place(self) -> None:
         counter = self.counter()
@@ -166,13 +168,18 @@ class ItemInfoList(list[ItemInfo]):
         return 拆分到紫材料._拆分特定稀有度精英材料(3)
 
     def sort_by_sort_id(self, reverse: bool = False) -> Self:
-        return self.__class__(sorted(self, key=lambda item_info: item_info.item.sort_id, reverse=reverse))
+        return self.__class__(
+            sorted(self, key=lambda item_info: item_info.item.sort_id, reverse=reverse)
+        )
 
     def sort_in_place_by_sort_id(self, reverse: bool = False) -> None:
         self.sort(key=lambda item_info: item_info.item.sort_id, reverse=reverse)
 
     def yituliu_item_value(self, *, strict: bool) -> float:
-        return sum(item_info.yituliu_item_value(strict=strict) * item_info.count for item_info in self)
+        return sum(
+            item_info.yituliu_item_value(strict=strict) * item_info.count
+            for item_info in self
+        )
 
     def to_csv(self) -> str:
         import csv
@@ -216,7 +223,13 @@ class ItemInfoList(list[ItemInfo]):
     def extend(self, items: ItemInfoListLike, /) -> None:
         super().extend(self.__class__.new(items))
 
-    def index(self, item: ItemInfoLike, start: SupportsIndex = 0, stop: SupportsIndex = sys.maxsize, /) -> int:
+    def index(
+        self,
+        item: ItemInfoLike,
+        start: SupportsIndex = 0,
+        stop: SupportsIndex = sys.maxsize,
+        /,
+    ) -> int:
         return super().index(ItemInfo.new(item), start, stop)
 
     def count(self, item: ItemInfoLike, /) -> int:
@@ -246,7 +259,9 @@ class ItemInfoList(list[ItemInfo]):
     @overload
     def __setitem__(self, key: slice, value: ItemInfoListLike, /) -> None: ...
 
-    def __setitem__(self, key: SupportsIndex | slice, value: ItemInfoLike | ItemInfoListLike, /) -> None:
+    def __setitem__(
+        self, key: SupportsIndex | slice, value: ItemInfoLike | ItemInfoListLike, /
+    ) -> None:
         if isinstance(key, slice):
             super().__setitem__(key, self.__class__.new(value))  # type: ignore
         else:

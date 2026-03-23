@@ -51,7 +51,9 @@ class PlayerBattleRank(StrEnum):
 
 class StageData_ConditionDesc(GameDataModel):
     stage_id: str
-    complete_state: PlayerBattleRank | int  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
+    complete_state: (
+        PlayerBattleRank | int
+    )  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
 
 
 class AppearanceStyle(StrEnum):
@@ -288,7 +290,9 @@ class StageData(GameDataModel):
     is_hard_predefined: bool
     is_skill_selectable_predefined: bool
     is_story_only: bool
-    appearance_style: AppearanceStyle | int  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
+    appearance_style: (
+        AppearanceStyle | int
+    )  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
     stage_drop_info: StageData_StageDropInfo
     can_use_charm: bool
     can_use_tech: bool

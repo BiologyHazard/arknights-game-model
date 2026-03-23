@@ -167,10 +167,10 @@ class GameData:
         )
 
     def load_workshop_formulas(self):
-        self.workshop_formulas = dict(
-            (id, WorkshopFormula(formula))
+        self.workshop_formulas = {
+            id: WorkshopFormula(formula)
             for id, formula in self.raw_data.excel.building_data.workshop_formulas.items()
-        )
+        }
 
     def calc_game_consts(self):
         self.累计消耗EXP = 计算累计消耗(

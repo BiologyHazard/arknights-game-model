@@ -1,10 +1,10 @@
 from enum import StrEnum
-from typing import Any, Literal
+from typing import Literal
 
-from arknights_game_model.model import GameDataModel
 from pydantic import ConfigDict, Field
 
 from arknights_game_model.item_info_model import ItemBundle
+from arknights_game_model.model import GameDataModel
 
 
 class RoomType(StrEnum):
