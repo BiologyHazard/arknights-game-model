@@ -22,7 +22,10 @@ class Item:
 
     @property
     def rarity(self) -> int:
-        return self._raw_data.rarity
+        if isinstance(self._raw_data.rarity, str):
+            return int(self._raw_data.rarity[-1]) - 1
+        else:
+            return self._raw_data.rarity
 
     @property
     def sort_id(self) -> int:

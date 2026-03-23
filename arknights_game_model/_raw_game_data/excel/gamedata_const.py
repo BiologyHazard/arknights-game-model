@@ -127,7 +127,9 @@ class GamedataConst(GameDataModel):
     default_min_multiple_battle_times: int
     default_max_multiple_battle_times: int
     multiple_action_open: bool
-    sub_profession_damage_type_pairs: dict[str, int]
+    sub_profession_damage_type_pairs: dict[
+        str, int | str
+    ]  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
     fever_game_data: GameDataConsts_FeverGameData
     classic_protect_char: list[str]
     birthday_setting_desc: str

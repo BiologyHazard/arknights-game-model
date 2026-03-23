@@ -1,6 +1,6 @@
 from enum import Enum
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from arknights_game_model.item_info_model import ItemBundle
 from arknights_game_model.model import GameDataModel
@@ -18,7 +18,7 @@ class PowerData(GameDataModel):
 
 
 class UnlockCondition(GameDataModel):
-    phase: int
+    phase: int | str  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
     level: int
 
 
@@ -80,13 +80,17 @@ class PhaseData(GameDataModel):
     range_id: str | None
     max_level: int
     attributes_key_frames: list[AttributeKeyFrame]
-    evolve_cost: list[ItemBundle]
+    evolve_cost: (
+        list[ItemBundle] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
 
 
 class SpecializeLevelData(GameDataModel):
     unlock_cond: UnlockCondition
     lvl_up_time: int
-    level_up_cost: list[ItemBundle]
+    level_up_cost: (
+        list[ItemBundle] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
 
 
 class MainSkill(GameDataModel):
@@ -110,23 +114,35 @@ class TalentData(GameDataModel):
 
 
 class TalentDataBundle(GameDataModel):
-    candidates: list[TalentData]
+    candidates: (
+        list[TalentData] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
 
 
 class AttributeModifier(GameDataModel):
-    attribute_type: int
-    formula_item: int
+    attribute_type: int | str  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
+    formula_item: int | str  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
     value: float
     load_from_blackboard: bool
     fetch_base_value_from_source_entity: bool
 
 
 class AttributeModifierData(GameDataModel):
-    abnormal_flags: list[int] = Field(max_length=0)
-    abnormal_immunes: list[int] = Field(max_length=0)
-    abnormal_antis: list[int] = Field(max_length=0)
-    abnormal_combos: list[int] = Field(max_length=0)
-    abnormal_combo_immunes: list[int] = Field(max_length=0)
+    abnormal_flags: list[int] | None = Field(
+        max_length=0
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
+    abnormal_immunes: list[int] | None = Field(
+        max_length=0
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
+    abnormal_antis: list[int] | None = Field(
+        max_length=0
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
+    abnormal_combos: list[int] | None = Field(
+        max_length=0
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
+    abnormal_combo_immunes: list[int] | None = Field(
+        max_length=0
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
     attribute_modifiers: list[AttributeModifier]
 
 
@@ -135,22 +151,36 @@ class ExternalBuff(GameDataModel):
 
 
 class PotentialRank(GameDataModel):
-    type: int
+    type: int | str  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
     description: str
     buff: ExternalBuff | None
-    equivalent_cost: list[ItemBundle] = Field(max_length=0)
+    equivalent_cost: list[ItemBundle] | None = Field(
+        max_length=0
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
 
 
 class AllSkillLvlup(GameDataModel):
     unlock_cond: UnlockCondition
-    lvl_up_cost: list[ItemBundle]
+    lvl_up_cost: (
+        list[ItemBundle] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
 
 
 class CharacterData(GameDataModel):
     name: str
     description: str | None
     sort_index: int
-    sp_target_type: SpecialOperatorTargetType = Field(strict=False)
+    sp_target_type: SpecialOperatorTargetType
+
+    @field_validator("sp_target_type", mode="before")
+    @classmethod
+    def validate_sp_target_type(cls, v):
+        if v == 0 or v == "NONE":
+            return SpecialOperatorTargetType.NONE
+        if v == 1 or v == "ROGUE":
+            return SpecialOperatorTargetType.ROGUE
+        return v
+
     sp_target_id: str | None
     can_use_general_potential_item: bool
     can_use_activity_potential_item: bool
@@ -161,27 +191,37 @@ class CharacterData(GameDataModel):
     group_id: str | None
     team_id: str | None
     main_power: PowerData
-    sub_power: list[PowerData]
+    sub_power: (
+        list[PowerData] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
     display_number: str | None
     appellation: str
     position: str
-    tag_list: list[str]
+    tag_list: (
+        list[str] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
     item_usage: str | None
     item_desc: str | None
     item_obtain_approach: str | None
     is_not_obtainable: bool
     is_sp_char: bool
     max_potential_level: int
-    rarity: int
+    rarity: int | str  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
     profession: str
     sub_profession_id: str
     trait: TraitDataBundle | None
     phases: list[PhaseData]
-    display_token_dict: dict[str, bool]
+    display_token_dict: (
+        dict[str, bool] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
     skills: list[MainSkill]
-    talents: list[TalentDataBundle]
+    talents: (
+        list[TalentDataBundle] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
     potential_ranks: list[PotentialRank]
-    favor_key_frames: list[AttributeKeyFrame]
+    favor_key_frames: (
+        list[AttributeKeyFrame] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
     all_skill_lvlup: list[AllSkillLvlup]
 
 

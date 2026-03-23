@@ -39,7 +39,7 @@ class FormulaItemType(StrEnum):
 
 
 class Cond(GameDataModel):
-    phase: int
+    phase: int | str  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
     level: int
 
 

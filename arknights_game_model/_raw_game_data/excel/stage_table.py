@@ -179,6 +179,7 @@ class StageDropType(StrEnum):
     CHARM_DROP = "CHARM_DROP"
     OVERRIDE_DROP = "OVERRIDE_DROP"
     ITEM_RETURN = "ITEM_RETURN"
+    CONDITION_DROP = "CONDITION_DROP"
 
 
 class WeightItemBundle(GameDataModel):
@@ -213,10 +214,18 @@ class StageData_DisplayDetailRewards(GameDataModel):
 
 
 class StageData_StageDropInfo(GameDataModel):
-    first_pass_rewards: list[ItemBundle]
-    first_complete_rewards: list[ItemBundle]
-    pass_rewards: list[list[WeightItemBundle]]
-    complete_rewards: list[list[WeightItemBundle]]
+    first_pass_rewards: (
+        list[ItemBundle] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
+    first_complete_rewards: (
+        list[ItemBundle] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
+    pass_rewards: (
+        list[list[WeightItemBundle]] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
+    complete_rewards: (
+        list[list[WeightItemBundle]] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
     display_rewards: list[StageData_DisplayRewards]
     display_detail_rewards: list[StageData_DisplayDetailRewards]
 
@@ -234,7 +243,9 @@ class StageData_SpecialStageUnlockProgressType(StrEnum):
 
 class StageData_SpecialProgressInfo(GameDataModel, strict=False):
     progress_type: StageData_SpecialStageUnlockProgressType = Field(strict=False)
-    desc_list: dict[int, str]
+    desc_list: (
+        dict[int, str] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
 
 
 class StageData_SpecialStoryInfo(GameDataModel):
@@ -303,10 +314,16 @@ class StageData(GameDataModel):
     start_button_override_id: str | None
     is_stage_patch: bool
     main_stage_id: str | None
-    extra_condition: list[StageData_ExtraConditionDesc]
-    extra_info: list[StageData_SpecialStoryInfo]
+    extra_condition: (
+        list[StageData_ExtraConditionDesc] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
+    extra_info: (
+        list[StageData_SpecialStoryInfo] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
     six_star_base_desc: str | None
-    six_star_display_reward_list: list[ItemBundle]
+    six_star_display_reward_list: (
+        list[ItemBundle] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
     advanced_rune_id_list1: list[str]
     advanced_rune_id_list2: list[str]
 

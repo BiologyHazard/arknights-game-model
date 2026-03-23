@@ -93,7 +93,7 @@ class UniEquip:
         """等级范围 `[1, 3]`"""
         if not 1 <= 目标等级 <= 3:
             raise ValueError("目标等级不合法")
-        if 目标等级 not in self._raw_data.item_cost:
+        if self._raw_data.item_cost is None or 目标等级 not in self._raw_data.item_cost:
             raise ValueError(f"模组 {self!r} 无法升级到等级 {目标等级}")
 
         return ItemInfoList.new(self._raw_data.item_cost[目标等级])
@@ -105,7 +105,11 @@ class UniEquip:
         if 初始等级 is None:
             初始等级 = 0
         if 目标等级 is None:
-            目标等级 = len(self._raw_data.item_cost)
+            目标等级 = (
+                len(self._raw_data.item_cost)
+                if self._raw_data.item_cost is not None
+                else 0
+            )
 
         item_info_list = ItemInfoList()
         for 当前等级 in range(初始等级, 目标等级):
@@ -152,7 +156,10 @@ class Character:
 
     @property
     def rarity(self) -> int:
-        return self._raw_data.rarity
+        if isinstance(self._raw_data.rarity, str):
+            return int(self._raw_data.rarity[-1]) - 1
+        else:
+            return self._raw_data.rarity
 
     @property
     def max_potential_level(self) -> int:
@@ -164,7 +171,10 @@ class Character:
 
     @property
     def tag_list(self) -> list[str]:
-        return self._raw_data.tag_list
+        if self._raw_data.tag_list is None:
+            return []
+        else:
+            return self._raw_data.tag_list
 
     @property
     def skill_count(self) -> int:
@@ -229,9 +239,9 @@ class Character:
 
         from .game_data import game_data
 
-        龙门币 = game_data.raw_data.excel.gamedata_const.evolve_gold_cost[
-            self._raw_data.rarity
-        ][目标精英化阶段 - 1]
+        龙门币 = game_data.raw_data.excel.gamedata_const.evolve_gold_cost[self.rarity][
+            目标精英化阶段 - 1
+        ]
         item_info_list = ItemInfoList.from_name_and_count([("龙门币", 龙门币)])
         item_info_list.extend(self._raw_data.phases[目标精英化阶段].evolve_cost)
         return item_info_list

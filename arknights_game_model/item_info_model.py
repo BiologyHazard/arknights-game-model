@@ -6,7 +6,7 @@ from collections.abc import Iterable, Mapping
 from typing import TYPE_CHECKING, NamedTuple, Self, SupportsIndex, TypedDict, overload
 
 type ItemInfoLike = ItemInfo | tuple[str, int | float] | str | ItemBundle
-type ItemInfoListLike = ItemInfoList | Iterable[ItemInfoLike] | str
+type ItemInfoListLike = ItemInfoList | Iterable[ItemInfoLike] | str | None
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -106,7 +106,9 @@ class ItemInfo(NamedTuple):
 class ItemInfoList(list[ItemInfo]):
     @classmethod
     def new(cls, arg: ItemInfoListLike) -> Self:
-        if isinstance(arg, cls):
+        if arg is None:
+            return cls()
+        elif isinstance(arg, cls):
             return arg
         elif isinstance(arg, str):
             return cls.from_str(arg)

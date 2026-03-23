@@ -13,15 +13,15 @@ class UniEquipData(GameDataModel, strict=False):
     type_name1: str
     type_name2: str | None
     equip_shining_color: str
-    show_evolve_phase: int
-    unlock_evolve_phase: int
+    show_evolve_phase: int | str  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
+    unlock_evolve_phase: int | str  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
     char_id: str
     tmpl_id: str | None
     show_level: int
     unlock_level: int
     mission_list: list[str]
-    unlock_favors: dict[str, int]
-    item_cost: dict[int, list[ItemBundle]]
+    unlock_favors: dict[str, int] | None  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
+    item_cost: dict[int, list[ItemBundle]] | None  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
     type: str
     uni_equip_get_time: int
     uni_equip_show_end: int
@@ -59,7 +59,7 @@ class UniEquipTypeInfo(GameDataModel):
 class UniEquipTrack(GameDataModel):
     char_id: str
     equip_id: str
-    type: int
+    type: int | str  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
     archive_show_time_end: int
 
 

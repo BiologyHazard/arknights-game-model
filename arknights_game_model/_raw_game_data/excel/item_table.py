@@ -29,7 +29,7 @@ class VoucherRelate(GameDataModel):
 
 
 class ShopRelateInfo(GameDataModel):
-    shop_type: int
+    shop_type: int | str  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
     shop_group: int
     start_ts: int
 
@@ -38,7 +38,7 @@ class Item(GameDataModel):
     item_id: str
     name: str
     description: str | None
-    rarity: int
+    rarity: int | str  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
     icon_id: str
     override_bkg: None
     stack_icon_id: str | None
@@ -50,8 +50,12 @@ class Item(GameDataModel):
     item_type: str
     stage_drop_list: list[StageDrop]
     building_product_list: list[BuildingProduct]
-    voucher_relate_list: list[VoucherRelate]
-    shop_relate_info_list: list[ShopRelateInfo]
+    voucher_relate_list: (
+        list[VoucherRelate] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
+    shop_relate_info_list: (
+        list[ShopRelateInfo] | None
+    )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None
 
 
 class ExpItem(GameDataModel):
@@ -67,7 +71,7 @@ class ApSupply(GameDataModel):
 
 class CharVoucherItem(GameDataModel):
     id: str
-    display_type: int
+    display_type: int | str  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
 
 
 class UniCollectionItem(GameDataModel):
