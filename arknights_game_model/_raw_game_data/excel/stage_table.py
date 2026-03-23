@@ -191,7 +191,7 @@ class WeightItemBundle(GameDataModel):
 
 
 class StageData_DisplayRewards(GameDataModel):
-    type: ItemType = Field(strict=False)
+    type: ItemType | int  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
     id: str
     drop_type: StageDropType | int  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
 
@@ -208,8 +208,8 @@ class OccPer(StrEnum):
 
 class StageData_DisplayDetailRewards(GameDataModel):
     occ_percent: OccPer | int  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
-    type: ItemType = Field(strict=False)
-    id: str
+    type: ItemType | int  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
+    id: str | None  # yuanyan3060 的仓库可能为 None，kengxxiao 的仓库必定不为 None
     drop_type: StageDropType | int  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
 
 
@@ -242,7 +242,9 @@ class StageData_SpecialStageUnlockProgressType(StrEnum):
 
 
 class StageData_SpecialProgressInfo(GameDataModel, strict=False):
-    progress_type: StageData_SpecialStageUnlockProgressType = Field(strict=False)
+    progress_type: (
+        StageData_SpecialStageUnlockProgressType | int
+    )  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
     desc_list: (
         dict[int, str] | None
     )  # kengxxiao 的仓库可能为 None，yuanyan3060 的仓库必定不为 None

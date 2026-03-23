@@ -75,7 +75,7 @@ class Buff(GameDataModel):
 
 
 class UnlockRoom(GameDataModel):
-    room_id: RoomType = Field(strict=False)
+    room_id: RoomType | int  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
     room_level: int
     room_count: int
 

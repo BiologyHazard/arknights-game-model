@@ -14,18 +14,18 @@ type RoomType = str
 
 class StageDrop(GameDataModel):
     stage_id: str
-    occ_per: OccPer
+    occ_per: OccPer | int  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
     sort_id: int
 
 
 class BuildingProduct(GameDataModel):
-    room_type: RoomType
+    room_type: RoomType | int  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
     formula_id: str
 
 
 class VoucherRelate(GameDataModel):
     voucher_id: str
-    voucher_item_type: str
+    voucher_item_type: str | int  # kengxxiao 的仓库是 str，yuanyan3060 的仓库是 int
 
 
 class ShopRelateInfo(GameDataModel):
