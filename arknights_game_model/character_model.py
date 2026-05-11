@@ -211,10 +211,12 @@ class Character:
         )
 
     def get_uniequip_by_type(self, type_name: str) -> UniEquip:
-        if type_name == "α":
-            type_name = "A"
         if type_name == "Δ":
             type_name = "D"
+        if type_name == "α":
+            type_name = "A"
+        if type_name == "β":
+            type_name = "B"
         for uniequip in self.uniequips().values():
             if type_name.upper() in (uniequip.type_name1, uniequip.type_name2):
                 return uniequip
