@@ -23,11 +23,8 @@ def default_filter(record: Record):
     return record["level"].no >= levelno
 
 
-logger.remove()
-logger.add(
-    sys.stderr,
-    level=0,
-    format=default_format,
-    filter=default_filter,
-    diagnose=True,
-)
+def configure_logger():
+    logger.remove()
+    logger.add(
+        sys.stderr, level=0, format=default_format, filter=default_filter, diagnose=True
+    )

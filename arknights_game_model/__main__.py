@@ -25,6 +25,9 @@ if __name__ == "__main__":
         game_data,
     )
     from arknights_game_model.item_info_model import ItemBundle, ItemInfo, ItemInfoList
+    from arknights_game_model.log import configure_logger
+
+    configure_logger()
 
     CST = timezone(timedelta(hours=8))
     fts = datetime.fromtimestamp
