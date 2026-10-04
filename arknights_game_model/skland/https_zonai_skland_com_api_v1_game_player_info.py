@@ -34,6 +34,7 @@ class Exp(GameDataModel):
 
 class Status(GameDataModel):
     uid: str
+    server_name: str
     name: str
     level: int
     avatar: Avatar
